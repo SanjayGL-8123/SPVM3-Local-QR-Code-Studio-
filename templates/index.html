@@ -1,0 +1,3153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SPVM3 Local QR Code Studio · Advanced Designer</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --card-border: #e2e8f0;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --accent-soft: #eef2ff;
+      --accent-glow: rgba(79, 70, 229, 0.15);
+      --success: #16a34a;
+      --danger: #dc2626;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at top left, #eef2ff 0%, #f8fafc 40%, #f1f5f9 100%);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 900;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+    .brand-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .brand-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: #dcfce7;
+      color: #15803d;
+      padding: 3px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-btn {
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: 1px solid var(--card-border);
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--ink);
+      transition: all 0.2s;
+    }
+    .header-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    /* Main Grid Layout */
+    .app-container {
+      max-width: 1380px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 420px;
+      gap: 28px;
+      flex: 1;
+    }
+    @media (max-width: 1024px) {
+      .app-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+      transition: box-shadow 0.2s;
+    }
+    .card:hover {
+      box-shadow: var(--shadow-md);
+    }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 750;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      letter-spacing: -0.01em;
+    }
+    .card-title-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .count-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    /* Content Type Tabs */
+    .content-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+      background: #f1f5f9;
+      padding: 6px;
+      border-radius: 14px;
+    }
+    .tab-btn {
+      flex: 1 1 auto;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 650;
+      background: transparent;
+      border: 0;
+      border-radius: 10px;
+      cursor: pointer;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab-btn:hover {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.5);
+    }
+    .tab-btn.active {
+      background: white;
+      color: var(--accent);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 650;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    input[type="text"], input[type="url"], input[type="password"], input[type="email"], input[type="tel"], textarea, select {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--ink);
+      transition: all 0.2s;
+      outline: none;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 85px;
+    }
+
+    /* Template Showcase Grid (Matching Image 1 top) */
+    .templates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+      gap: 12px;
+      max-height: 290px;
+      overflow-y: auto;
+      padding: 6px 2px;
+    }
+    .template-item {
+      border: 2px solid var(--card-border);
+      border-radius: 12px;
+      padding: 6px;
+      background: white;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .template-item:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: 0 6px 14px rgba(79, 70, 229, 0.12);
+    }
+    .template-item.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+    .template-preview {
+      width: 60px;
+      height: 60px;
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .template-name {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    /* Accordion Decorative Frame Categories (Matching Images 1, 2, 3) */
+    .frame-search {
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .frame-search input {
+      padding-left: 34px;
+    }
+    .frame-search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .accordion-item {
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: white;
+      transition: all 0.2s;
+    }
+    .accordion-header {
+      padding: 12px 16px;
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--ink);
+      transition: background 0.2s;
+    }
+    .accordion-header:hover {
+      background: #f1f5f9;
+    }
+    .accordion-header.active {
+      background: #eef2ff;
+      color: var(--accent);
+    }
+    .accordion-arrow {
+      transition: transform 0.2s;
+      font-size: 0.75rem;
+    }
+    .accordion-header.active .accordion-arrow {
+      transform: rotate(180deg);
+    }
+    .accordion-content {
+      display: none;
+      padding: 14px;
+      border-top: 1px solid var(--card-border);
+      background: #ffffff;
+    }
+    .accordion-content.show {
+      display: block;
+    }
+    .frames-subgrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+      gap: 12px;
+    }
+    .frame-btn {
+      border: 2px solid var(--card-border);
+      border-radius: 10px;
+      padding: 6px;
+      background: white;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .frame-btn:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+    .frame-btn.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+    .frame-thumb {
+      width: 58px;
+      height: 58px;
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .frame-thumb svg {
+      width: 100%;
+      height: 100%;
+    }
+    .frame-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    /* Style Option Grids */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+      gap: 10px;
+    }
+    .option-card {
+      border: 2px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 8px;
+      background: white;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .option-card:hover {
+      border-color: var(--accent);
+    }
+    .option-card.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+    .option-icon {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+    }
+    .option-title {
+      font-size: 0.72rem;
+      font-weight: 650;
+      color: var(--ink);
+    }
+
+    /* Color Customizer */
+    .color-picker-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .color-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #cbd5e1;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: white;
+    }
+    input[type="color"] {
+      -webkit-appearance: none;
+      appearance: none;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    input[type="color"]::-webkit-color-swatch {
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 6px;
+    }
+    .color-hex {
+      font-family: monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink);
+      width: 72px;
+      border: none;
+      outline: none;
+    }
+    .palette-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .palette-chip {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 0 0 1px #cbd5e1;
+      transition: transform 0.15s;
+    }
+    .palette-chip:hover {
+      transform: scale(1.15);
+    }
+
+    /* Checkbox & Switches */
+    .checkbox-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .checkbox-wrap input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    /* Logo Upload & Presets */
+    .logo-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .logo-chip {
+      width: 38px;
+      height: 38px;
+      border: 2px solid var(--card-border);
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s;
+    }
+    .logo-chip:hover {
+      border-color: var(--accent);
+      transform: scale(1.05);
+    }
+    .logo-chip.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+    .upload-box {
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      background: #f8fafc;
+      transition: all 0.2s;
+      margin-top: 10px;
+    }
+    .upload-box:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .upload-box input {
+      display: none;
+    }
+
+    /* Right Preview Side Column */
+    .preview-column {
+      position: sticky;
+      top: 86px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      height: fit-content;
+    }
+    .preview-card {
+      background: white;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      text-align: center;
+    }
+    .canvas-container {
+      width: 100%;
+      min-height: 340px;
+      background: radial-gradient(#e2e8f0 10%, transparent 11%);
+      background-size: 16px 16px;
+      background-color: #fafbfc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    #previewSvg {
+      max-width: 100%;
+      max-height: 360px;
+      width: auto;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.08));
+      transition: transform 0.2s;
+    }
+    .preview-info {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .scannable-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      color: #15803d;
+      background: #dcfce7;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .scannable-dot {
+      width: 7px;
+      height: 7px;
+      background: #16a34a;
+      border-radius: 50%;
+    }
+
+    /* Action Buttons */
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      font-weight: 750;
+      border: 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: white;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #4338ca, #4f46e5);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(79, 70, 229, 0.45);
+    }
+    .btn-secondary {
+      background: #f1f5f9;
+      color: var(--ink);
+      border: 1px solid #cbd5e1;
+    }
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #cbd5e1;
+      color: var(--muted);
+    }
+    .btn-outline:hover {
+      background: #f8fafc;
+      color: var(--ink);
+    }
+    .res-select {
+      flex: 0 0 130px;
+      padding: 10px;
+      font-size: 0.85rem;
+      font-weight: 650;
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Range Sliders */
+    .slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .slider-val {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--muted);
+      min-width: 38px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      border-top: 1px solid var(--card-border);
+      background: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">SP</div>
+      <div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="brand-title">SPVM3 Local QR Code Studio</span>
+          <span class="brand-badge">Offline Local App</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" id="resetAllBtn" title="Reset all options">🔄 Reset</button>
+      <button class="header-btn" id="sampleDataBtn" title="Load sample content">💡 Sample</button>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="app-container">
+
+    <!-- Left Controls Section -->
+    <div class="controls-column">
+
+      <!-- Section 1: Content Type -->
+      <section class="card">
+        <div class="card-title">
+          <span class="card-title-icon">📝 1. Content & Type</span>
+          <span class="count-badge" id="typeBadge">URL</span>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="content-tabs" id="contentTabs">
+          <button type="button" class="tab-btn active" data-type="url">🌐 URL</button>
+          <button type="button" class="tab-btn" data-type="text">📄 Text</button>
+          <button type="button" class="tab-btn" data-type="wifi">📶 Wi-Fi</button>
+          <button type="button" class="tab-btn" data-type="vcard">👤 vCard</button>
+          <button type="button" class="tab-btn" data-type="email">✉️ Email</button>
+          <button type="button" class="tab-btn" data-type="phone">📞 Phone</button>
+          <button type="button" class="tab-btn" data-type="sms">💬 SMS</button>
+          <button type="button" class="tab-btn" data-type="whatsapp">📱 WhatsApp</button>
+        </div>
+
+        <!-- Form Panels -->
+        <!-- 1. URL -->
+        <div class="type-panel" id="panel-url">
+          <div class="form-group">
+            <label for="urlInput">Website URL</label>
+            <input type="url" id="urlInput" placeholder="https://example.com" value="https://google.com">
+          </div>
+        </div>
+
+        <!-- 2. Text -->
+        <div class="type-panel" id="panel-text" style="display:none;">
+          <div class="form-group">
+            <label for="textInput">Plain Text Content</label>
+            <textarea id="textInput" placeholder="Type any plain text message or notes..."></textarea>
+          </div>
+        </div>
+
+        <!-- 3. Wi-Fi -->
+        <div class="type-panel" id="panel-wifi" style="display:none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="wifiSsid">Network Name (SSID)</label>
+              <input type="text" id="wifiSsid" placeholder="Home-WiFi">
+            </div>
+            <div class="form-group">
+              <label for="wifiAuth">Security Encryption</label>
+              <select id="wifiAuth">
+                <option value="WPA">WPA/WPA2/WPA3</option>
+                <option value="WEP">WEP</option>
+                <option value="nopass">Open (No password)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="wifiPass">Password</label>
+              <input type="text" id="wifiPass" placeholder="Enter Wi-Fi password">
+            </div>
+            <div class="form-group" style="display:flex; align-items:flex-end; padding-bottom:8px;">
+              <label class="checkbox-wrap">
+                <input type="checkbox" id="wifiHidden"> Hidden Network SSID
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. vCard -->
+        <div class="type-panel" id="panel-vcard" style="display:none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="vcardFirst">First Name</label>
+              <input type="text" id="vcardFirst" placeholder="Jane">
+            </div>
+            <div class="form-group">
+              <label for="vcardLast">Last Name</label>
+              <input type="text" id="vcardLast" placeholder="Doe">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="vcardOrg">Organization / Company</label>
+              <input type="text" id="vcardOrg" placeholder="Acme Studio">
+            </div>
+            <div class="form-group">
+              <label for="vcardTitle">Job Title</label>
+              <input type="text" id="vcardTitle" placeholder="Creative Director">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="vcardPhone">Phone Number</label>
+              <input type="tel" id="vcardPhone" placeholder="+1 (555) 019-2834">
+            </div>
+            <div class="form-group">
+              <label for="vcardEmail">Email Address</label>
+              <input type="email" id="vcardEmail" placeholder="jane.doe@example.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="vcardUrl">Personal / Work Website</label>
+            <input type="url" id="vcardUrl" placeholder="https://janedoe.com">
+          </div>
+        </div>
+
+        <!-- 5. Email -->
+        <div class="type-panel" id="panel-email" style="display:none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="emailTo">Recipient Email</label>
+              <input type="email" id="emailTo" placeholder="contact@example.com">
+            </div>
+            <div class="form-group">
+              <label for="emailSubject">Subject Line</label>
+              <input type="text" id="emailSubject" placeholder="Hello!">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="emailBody">Message Body</label>
+            <textarea id="emailBody" placeholder="Hi, I would like to inquire about..."></textarea>
+          </div>
+        </div>
+
+        <!-- 6. Phone -->
+        <div class="type-panel" id="panel-phone" style="display:none;">
+          <div class="form-group">
+            <label for="phoneInput">Phone Number to Call</label>
+            <input type="tel" id="phoneInput" placeholder="+1234567890">
+          </div>
+        </div>
+
+        <!-- 7. SMS -->
+        <div class="type-panel" id="panel-sms" style="display:none;">
+          <div class="form-group">
+            <label for="smsPhone">Recipient Phone Number</label>
+            <input type="tel" id="smsPhone" placeholder="+1234567890">
+          </div>
+          <div class="form-group">
+            <label for="smsMessage">Pre-filled SMS Text</label>
+            <textarea id="smsMessage" placeholder="I am interested in your services..."></textarea>
+          </div>
+        </div>
+
+        <!-- 8. WhatsApp -->
+        <div class="type-panel" id="panel-whatsapp" style="display:none;">
+          <div class="form-group">
+            <label for="waPhone">WhatsApp Number (with Country Code)</label>
+            <input type="tel" id="waPhone" placeholder="+15551234567">
+          </div>
+          <div class="form-group">
+            <label for="waText">Pre-filled Chat Message</label>
+            <textarea id="waText" placeholder="Hi! I am reaching out regarding..."></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: Templates & Presets (Image 1 top) -->
+      <section class="card">
+        <div class="card-title">
+          <span class="card-title-icon">🎨 2. Design Templates & Quick Presets</span>
+          <span class="count-badge" id="templateCount">24 Styles</span>
+        </div>
+        <p style="font-size:0.82rem; color:var(--muted); margin-bottom:12px;">Click any preset to instantly apply curated colors, festive frames, dot styles, and corner badges.</p>
+        <div class="templates-grid" id="templatesGrid">
+          <!-- Populated by JS with 24+ template cards -->
+        </div>
+      </section>
+
+      <!-- Section 3: Decorative Frames & Themes (Images 1, 2, 3) -->
+      <section class="card">
+        <div class="card-title">
+          <span class="card-title-icon">🖼️ 3. Decorative Frames & Festival Themes</span>
+          <span class="count-badge">18 Categories</span>
+        </div>
+        <p style="font-size:0.82rem; color:var(--muted); margin-bottom:12px;">Choose a festive occasion or modern frame. Customize the text badge below.</p>
+
+        <!-- Search frames filter -->
+        <div class="frame-search">
+          <span class="frame-search-icon">🔍</span>
+          <input type="text" id="frameSearchInput" placeholder="Filter categories (e.g. New Year, Wedding, Holi, Tet, Father's Day)...">
+        </div>
+
+        <!-- Frame Customization Settings -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px; margin-bottom:16px;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="frameTextInput">Frame Text / Call to Action</label>
+              <input type="text" id="frameTextInput" value="SCAN ME" maxlength="28" placeholder="e.g. SCAN ME, HAPPY NEW YEAR">
+            </div>
+            <div class="form-group">
+              <label>Frame Color & Text Color</label>
+              <div style="display:flex; gap:10px;">
+                <div class="color-input-wrap" title="Frame Color">
+                  <input type="color" id="frameColorInput" value="#4f46e5">
+                  <input type="text" class="color-hex" id="frameColorHex" value="#4f46e5">
+                </div>
+                <div class="color-input-wrap" title="Frame Text Color">
+                  <input type="color" id="frameTextColorInput" value="#ffffff">
+                  <input type="text" class="color-hex" id="frameTextColorHex" value="#ffffff">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categories Accordion (Matches User Uploaded Images 1, 2, 3) -->
+        <div class="accordion" id="framesAccordion">
+          <!-- Populated by JavaScript with all 18 categories and 80+ frames! -->
+        </div>
+      </section>
+
+      <!-- Section 4: Colors & Gradients -->
+      <section class="card">
+        <div class="card-title">
+          <span class="card-title-icon">🌈 4. Colors & Gradients</span>
+        </div>
+
+        <div class="form-row">
+          <!-- Foreground Color / Gradient -->
+          <div>
+            <label>QR Code Pattern Color</label>
+            <div class="color-picker-row">
+              <div class="color-input-wrap">
+                <input type="color" id="qrColor1" value="#0f172a">
+                <input type="text" class="color-hex" id="qrColor1Hex" value="#0f172a">
+              </div>
+              <label class="checkbox-wrap" style="font-size:0.78rem;">
+                <input type="checkbox" id="gradientToggle"> Use Gradient
+              </label>
+            </div>
+
+            <!-- Gradient Second Color -->
+            <div id="gradientRow" style="display:none; margin-bottom:12px;">
+              <label>Gradient Secondary Color</label>
+              <div class="color-picker-row">
+                <div class="color-input-wrap">
+                  <input type="color" id="qrColor2" value="#4f46e5">
+                  <input type="text" class="color-hex" id="qrColor2Hex" value="#4f46e5">
+                </div>
+                <select id="gradientType" style="width:110px; padding:6px 10px; font-size:0.8rem;">
+                  <option value="linear">Linear</option>
+                  <option value="radial">Radial</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Quick Palettes -->
+            <label style="font-size:0.75rem; color:var(--muted); margin-top:6px;">Curated Color Palettes</label>
+            <div class="palette-chips">
+              <span class="palette-chip" style="background:#0f172a;" data-c1="#0f172a" data-c2="#334155" title="Classic Slate"></span>
+              <span class="palette-chip" style="background:#4f46e5;" data-c1="#4f46e5" data-c2="#7c3aed" title="Electric Indigo"></span>
+              <span class="palette-chip" style="background:#0284c7;" data-c1="#0284c7" data-c2="#06b6d4" title="Cyan Ocean"></span>
+              <span class="palette-chip" style="background:#059669;" data-c1="#059669" data-c2="#10b981" title="Emerald Mint"></span>
+              <span class="palette-chip" style="background:#ea580c;" data-c1="#ea580c" data-c2="#f97316" title="Sunset Coral"></span>
+              <span class="palette-chip" style="background:#dc2626;" data-c1="#dc2626" data-c2="#f43f5e" title="Crimson Red"></span>
+              <span class="palette-chip" style="background:#9333ea;" data-c1="#9333ea" data-c2="#c084fc" title="Royal Violet"></span>
+              <span class="palette-chip" style="background:#d97706;" data-c1="#d97706" data-c2="#fbbf24" title="Gold Amber"></span>
+              <span class="palette-chip" style="background:#78350f;" data-c1="#78350f" data-c2="#92400e" title="Artisan Coffee"></span>
+            </div>
+          </div>
+
+          <!-- Background Color -->
+          <div>
+            <label>Background Color</label>
+            <div class="color-picker-row">
+              <div class="color-input-wrap">
+                <input type="color" id="bgColor" value="#ffffff">
+                <input type="text" class="color-hex" id="bgColorHex" value="#ffffff">
+              </div>
+              <label class="checkbox-wrap" style="font-size:0.78rem;">
+                <input type="checkbox" id="transparentBg"> Transparent
+              </label>
+            </div>
+
+            <!-- Eye Colors Customization -->
+            <label style="margin-top:14px;">Corner Eye Colors</label>
+            <div style="margin-top:4px;">
+              <label class="checkbox-wrap" style="font-size:0.78rem; margin-bottom:8px;">
+                <input type="checkbox" id="customEyeColorToggle"> Custom Eye Colors
+              </label>
+              <div id="eyeColorRow" style="display:none; gap:10px;">
+                <div class="color-input-wrap" title="Outer Eye Frame">
+                  <input type="color" id="eyeOuterColor" value="#4f46e5">
+                  <input type="text" class="color-hex" id="eyeOuterColorHex" value="#4f46e5">
+                </div>
+                <div class="color-input-wrap" title="Inner Eye Ball">
+                  <input type="color" id="eyeInnerColor" value="#dc2626">
+                  <input type="text" class="color-hex" id="eyeInnerColorHex" value="#dc2626">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 5: Shapes & Styling -->
+      <section class="card">
+        <div class="card-title">
+          <span class="card-title-icon">✨ 5. Shapes & Patterns</span>
+        </div>
+
+        <!-- Body Dots Pattern -->
+        <label>Body Module Pattern</label>
+        <div class="options-grid" id="dotStyleOptions" style="margin-bottom:18px;">
+          <div class="option-card active" data-value="square">
+            <div class="option-icon">■</div>
+            <div class="option-title">Square</div>
+          </div>
+          <div class="option-card" data-value="rounded">
+            <div class="option-icon">▢</div>
+            <div class="option-title">Rounded</div>
+          </div>
+          <div class="option-card" data-value="dots">
+            <div class="option-icon">●</div>
+            <div class="option-title">Dots</div>
+          </div>
+          <div class="option-card" data-value="diamond">
+            <div class="option-icon">◆</div>
+            <div class="option-title">Diamond</div>
+          </div>
+          <div class="option-card" data-value="leaf">
+            <div class="option-icon">🍃</div>
+            <div class="option-title">Leaf</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <!-- Outer Eye Shape -->
+          <div>
+            <label>Outer Corner Frame</label>
+            <div class="options-grid" id="eyeFrameOptions">
+              <div class="option-card active" data-value="square">
+                <div class="option-title">Square</div>
+              </div>
+              <div class="option-card" data-value="rounded">
+                <div class="option-title">Rounded</div>
+              </div>
+              <div class="option-card" data-value="circle">
+                <div class="option-title">Circle</div>
+              </div>
+              <div class="option-card" data-value="leaf">
+                <div class="option-title">Leaf</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inner Eye Ball Shape -->
+          <div>
+            <label>Inner Eye Ball</label>
+            <div class="options-grid" id="eyeBallOptions">
+              <div class="option-card active" data-value="square">
+                <div class="option-title">Square</div>
+              </div>
+              <div class="option-card" data-value="circle">
+                <div class="option-title">Circle</div>
+              </div>
+              <div class="option-card" data-value="diamond">
+                <div class="option-title">Diamond</div>
+              </div>
+              <div class="option-card" data-value="rounded">
+                <div class="option-title">Smooth</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 6: Logo / Center Icon -->
+      <section class="card">
+        <div class="card-title">
+          <span class="card-title-icon">🏷️ 6. Logo & Center Icon</span>
+          <span class="count-badge">Optional</span>
+        </div>
+
+        <p style="font-size:0.82rem; color:var(--muted);">Add a brand logo or select a common app icon. Error correction is automatically elevated to guarantee high scan reliability.</p>
+
+        <!-- Preset Logo Icons -->
+        <div class="logo-presets" id="logoPresets">
+          <div class="logo-chip active" data-icon="none" title="No logo">❌</div>
+          <div class="logo-chip" data-icon="web" title="Website Globe">🌐</div>
+          <div class="logo-chip" data-icon="wifi" title="Wi-Fi">📶</div>
+          <div class="logo-chip" data-icon="phone" title="Phone">📞</div>
+          <div class="logo-chip" data-icon="mail" title="Mail">✉️</div>
+          <div class="logo-chip" data-icon="location" title="Location">📍</div>
+          <div class="logo-chip" data-icon="whatsapp" title="WhatsApp">💬</div>
+          <div class="logo-chip" data-icon="instagram" title="Instagram">📷</div>
+          <div class="logo-chip" data-icon="youtube" title="YouTube">▶️</div>
+          <div class="logo-chip" data-icon="facebook" title="Facebook">📘</div>
+          <div class="logo-chip" data-icon="cart" title="Shopping Cart">🛒</div>
+          <div class="logo-chip" data-icon="heart" title="Heart">❤️</div>
+          <div class="logo-chip" data-icon="star" title="Star">⭐</div>
+          <div class="logo-chip" data-icon="coffee" title="Coffee">☕</div>
+        </div>
+
+        <!-- Custom Upload Area -->
+        <label class="upload-box" id="uploadBox">
+          <input type="file" id="logoFileInput" accept="image/png, image/jpeg, image/svg+xml, image/webp">
+          <div style="font-size:1.3rem; margin-bottom:4px;">📤</div>
+          <div style="font-size:0.85rem; font-weight:700; color:var(--ink);">Click to upload custom logo</div>
+          <div style="font-size:0.75rem; color:var(--muted); margin-top:2px;">Supports PNG, JPG, or SVG with transparency</div>
+        </label>
+
+        <!-- Logo Controls -->
+        <div id="logoControls" style="display:none; margin-top:14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px;">
+          <div class="form-row">
+            <div>
+              <label>Logo Size</label>
+              <div class="slider-wrap">
+                <input type="range" id="logoSizeSlider" min="15" max="32" value="22">
+                <span class="slider-val" id="logoSizeVal">22%</span>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center;">
+              <label class="checkbox-wrap">
+                <input type="checkbox" id="logoBgToggle" checked> Remove background / White badge
+              </label>
+            </div>
+          </div>
+          <button type="button" class="header-btn" id="removeLogoBtn" style="margin-top:8px; color:var(--danger); border-color:#fecaca;">Remove uploaded logo</button>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Right Sticky Preview Column -->
+    <div class="preview-column">
+      <div class="preview-card">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <h2 style="font-size:1.15rem; font-weight:800; letter-spacing:-0.02em;">Live Studio Preview</h2>
+          <span class="scannable-pill"><span class="scannable-dot"></span> Ready to Scan</span>
+        </div>
+
+        <!-- Real-time SVG Canvas Holder -->
+        <div class="canvas-container" id="canvasContainer">
+          <svg id="previewSvg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+            <!-- Dynamically populated -->
+          </svg>
+        </div>
+
+        <div class="preview-info">
+          <span id="matrixSizeText">Version: Auto (25×25)</span>
+          <span id="ecLevelText">EC: High (30%)</span>
+        </div>
+
+        <!-- Download Actions -->
+        <div class="btn-group">
+          <div class="btn-row">
+            <select class="res-select" id="exportResolution" title="Export Resolution">
+              <option value="500">500 × 500 px (Web)</option>
+              <option value="1000" selected>1000 × 1000 px (HD)</option>
+              <option value="2000">2000 × 2000 px (Print)</option>
+            </select>
+            <button class="btn btn-primary" id="downloadPngBtn">
+              📥 Download PNG
+            </button>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" id="downloadSvgBtn" style="flex:1;">
+              📐 Download SVG
+            </button>
+            <button class="btn btn-outline" id="copyClipboardBtn" style="flex:1;">
+              📋 Copy Image
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Hint Card -->
+      <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:16px; font-size:0.8rem; color:var(--muted); line-height:1.5;">
+        <strong style="color:var(--ink);">💡 Offline Studio:</strong> All calculations, SVG art, and image rasterization happen 100% on your device. Scan with your smartphone camera to verify content before distribution.
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toast">✅ Action completed</div>
+
+  <!-- Off-screen Canvas for PNG rasterization -->
+  <canvas id="exportCanvas" style="display:none;"></canvas>
+
+  <footer>
+    SPVM3 Local QR Code Studio · High Resolution & Festive Templates · 100% Offline on Localhost
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    /* ==========================================================================
+       1. Standalone Pure JS QR Code Matrix Engine (Kazuhiko Arase Standard)
+       ========================================================================== */
+    const QRCodeLib = (function() {
+      function QR8BitByte(data) {
+        this.mode = 4;
+        this.data = data;
+        this.parsedData = [];
+        for (let i = 0; i < data.length; i++) {
+          let byteArray = [];
+          let code = data.charCodeAt(i);
+          if (code > 0x10000) {
+            byteArray[0] = 0xF0 | ((code & 0x1C0000) >>> 18);
+            byteArray[1] = 0x80 | ((code & 0x3F000) >>> 12);
+            byteArray[2] = 0x80 | ((code & 0xFC0) >>> 6);
+            byteArray[3] = 0x80 | (code & 0x3F);
+          } else if (code > 0x800) {
+            byteArray[0] = 0xE0 | ((code & 0xF000) >>> 12);
+            byteArray[1] = 0x80 | ((code & 0xFC0) >>> 6);
+            byteArray[2] = 0x80 | (code & 0x3F);
+          } else if (code > 0x80) {
+            byteArray[0] = 0xC0 | ((code & 0x7C0) >>> 6);
+            byteArray[1] = 0x80 | (code & 0x3F);
+          } else {
+            byteArray[0] = code;
+          }
+          this.parsedData.push(...byteArray);
+        }
+      }
+      QR8BitByte.prototype = {
+        getLength: function() { return this.parsedData.length; },
+        write: function(buffer) {
+          for (let i = 0; i < this.parsedData.length; i++) {
+            buffer.put(this.parsedData[i], 8);
+          }
+        }
+      };
+
+      const QRMath = {
+        glog: function(n) {
+          if (n < 1) throw new Error("glog(" + n + ")");
+          return QRMath.LOG_TABLE[n];
+        },
+        gexp: function(n) {
+          while (n < 0) n += 255;
+          while (n >= 255) n -= 255;
+          return QRMath.EXP_TABLE[n];
+        },
+        EXP_TABLE: new Array(256),
+        LOG_TABLE: new Array(256)
+      };
+      for (let i = 0; i < 8; i++) QRMath.EXP_TABLE[i] = 1 << i;
+      for (let i = 8; i < 256; i++) QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4] ^ QRMath.EXP_TABLE[i - 5] ^ QRMath.EXP_TABLE[i - 6] ^ QRMath.EXP_TABLE[i - 8];
+      for (let i = 0; i < 255; i++) QRMath.LOG_TABLE[QRMath.EXP_TABLE[i]] = i;
+
+      function QRPolynomial(num, shift) {
+        let offset = 0;
+        while (offset < num.length && num[offset] == 0) offset++;
+        this.num = new Array(num.length - offset + shift);
+        for (let i = 0; i < num.length - offset; i++) this.num[i] = num[i + offset];
+      }
+      QRPolynomial.prototype = {
+        get: function(index) { return this.num[index]; },
+        getLength: function() { return this.num.length; },
+        multiply: function(e) {
+          let num = new Array(this.getLength() + e.getLength() - 1);
+          for (let i = 0; i < this.getLength(); i++) {
+            for (let j = 0; j < e.getLength(); j++) {
+              num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i)) + QRMath.glog(e.get(j)));
+            }
+          }
+          return new QRPolynomial(num, 0);
+        },
+        mod: function(e) {
+          if (this.getLength() - e.getLength() < 0) return this;
+          let ratio = QRMath.glog(this.get(0)) - QRMath.glog(e.get(0));
+          let num = new Array(this.getLength());
+          for (let i = 0; i < this.getLength(); i++) num[i] = this.get(i);
+          for (let i = 0; i < e.getLength(); i++) num[i] ^= QRMath.gexp(QRMath.glog(e.get(i)) + ratio);
+          return new QRPolynomial(num, 0).mod(e);
+        }
+      };
+
+      const QRRSBlock = {
+        RS_BLOCK_TABLE: [
+          [1, 26, 19], [1, 26, 16], [1, 26, 13], [1, 26, 9],
+          [1, 44, 34], [1, 44, 28], [1, 44, 22], [1, 44, 16],
+          [1, 70, 55], [1, 70, 44], [2, 35, 17], [2, 35, 13],
+          [1, 100, 80], [2, 50, 32], [2, 50, 24], [4, 25, 9],
+          [1, 134, 108], [2, 67, 43], [2, 33, 15, 2, 34, 16], [2, 33, 11, 2, 34, 12],
+          [2, 86, 68], [4, 43, 27], [4, 43, 19], [4, 43, 15],
+          [2, 98, 78], [4, 49, 31], [2, 32, 14, 4, 33, 15], [4, 39, 13, 1, 40, 14],
+          [2, 121, 97], [2, 60, 38, 2, 61, 39], [4, 40, 18, 2, 41, 19], [4, 40, 14, 2, 41, 15],
+          [2, 146, 116], [3, 58, 36, 2, 59, 37], [4, 36, 16, 4, 37, 17], [4, 36, 12, 4, 37, 13],
+          [2, 86, 68, 2, 87, 69], [4, 69, 43, 1, 70, 44], [6, 43, 19, 2, 44, 20], [6, 43, 15, 2, 44, 16]
+        ],
+        getRSBlocks: function(typeNumber, errorCorrectLevel) {
+          let rsBlock = QRRSBlock.getRsBlockTable(typeNumber, errorCorrectLevel);
+          if (!rsBlock) throw new Error("bad rs block @ typeNumber:" + typeNumber + "/errorCorrectLevel:" + errorCorrectLevel);
+          let length = rsBlock.length / 3;
+          let list = [];
+          for (let i = 0; i < length; i++) {
+            let count = rsBlock[i * 3 + 0];
+            let totalCount = rsBlock[i * 3 + 1];
+            let dataCount = rsBlock[i * 3 + 2];
+            for (let j = 0; j < count; j++) list.push({ totalCount: totalCount, dataCount: dataCount });
+          }
+          return list;
+        },
+        getRsBlockTable: function(typeNumber, errorCorrectLevel) {
+          switch (errorCorrectLevel) {
+            case 1: return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0]; // L
+            case 0: return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1]; // M
+            case 3: return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2]; // Q
+            case 2: return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3]; // H
+            default: return undefined;
+          }
+        }
+      };
+
+      function QRBitBuffer() {
+        this.buffer = [];
+        this.length = 0;
+      }
+      QRBitBuffer.prototype = {
+        get: function(index) {
+          let bufIndex = Math.floor(index / 8);
+          return ((this.buffer[bufIndex] >>> (7 - index % 8)) & 1) == 1;
+        },
+        put: function(num, length) {
+          for (let i = 0; i < length; i++) this.putBit(((num >>> (length - i - 1)) & 1) == 1);
+        },
+        getLengthInBits: function() { return this.length; },
+        putBit: function(bit) {
+          let bufIndex = Math.floor(this.length / 8);
+          if (this.buffer.length <= bufIndex) this.buffer.push(0);
+          if (bit) this.buffer[bufIndex] |= (0x80 >>> (this.length % 8));
+          this.length++;
+        }
+      };
+
+      const QRUtil = {
+        PATTERN_POSITION_TABLE: [
+          [], [6, 18], [6, 22], [6, 26], [6, 30], [6, 34],
+          [6, 22, 38], [6, 24, 42], [6, 26, 46], [6, 28, 50]
+        ],
+        G15: (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0),
+        G18: (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0),
+        G15_MASK: (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1),
+        getBCHTypeInfo: function(data) {
+          let d = data << 10;
+          while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
+            d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15)));
+          }
+          return ((data << 10) | d) ^ QRUtil.G15_MASK;
+        },
+        getBCHDigit: function(data) {
+          let digit = 0;
+          while (data != 0) { digit++; data >>>= 1; }
+          return digit;
+        },
+        getPatternPosition: function(typeNumber) {
+          return QRUtil.PATTERN_POSITION_TABLE[typeNumber - 1] || [];
+        },
+        getMask: function(maskPattern, i, j) {
+          switch (maskPattern) {
+            case 0: return (i + j) % 2 == 0;
+            case 1: return i % 2 == 0;
+            case 2: return j % 3 == 0;
+            case 3: return (i + j) % 3 == 0;
+            case 4: return (Math.floor(i / 2) + Math.floor(j / 3)) % 2 == 0;
+            case 5: return (i * j) % 2 + (i * j) % 3 == 0;
+            case 6: return ((i * j) % 2 + (i * j) % 3) % 2 == 0;
+            case 7: return ((i * j) % 3 + (i + j) % 2) % 2 == 0;
+            default: throw new Error("bad maskPattern:" + maskPattern);
+          }
+        },
+        getErrorCorrectionPolynomial: function(errorCorrectLength) {
+          let a = new QRPolynomial([1], 0);
+          for (let i = 0; i < errorCorrectLength; i++) {
+            a = a.multiply(new QRPolynomial([1, QRMath.gexp(i)], 0));
+          }
+          return a;
+        },
+        getLengthInBits: function(mode, type) {
+          if (1 <= type && type < 10) return 8;
+          return 16;
+        },
+        getLostPoint: function(qrCode) {
+          let moduleCount = qrCode.getModuleCount();
+          let lostPoint = 0;
+          for (let row = 0; row < moduleCount; row++) {
+            for (let col = 0; col < moduleCount; col++) {
+              let sameCount = 0;
+              let dark = qrCode.isDark(row, col);
+              for (let r = -1; r <= 1; r++) {
+                if (row + r < 0 || moduleCount <= row + r) continue;
+                for (let c = -1; c <= 1; c++) {
+                  if (col + c < 0 || moduleCount <= col + c) continue;
+                  if (r == 0 && c == 0) continue;
+                  if (dark == qrCode.isDark(row + r, col + c)) sameCount++;
+                }
+              }
+              if (sameCount > 5) lostPoint += (3 + sameCount - 5);
+            }
+          }
+          return lostPoint;
+        }
+      };
+
+      function QRCodeModel(typeNumber, errorCorrectLevel) {
+        this.typeNumber = typeNumber;
+        this.errorCorrectLevel = errorCorrectLevel;
+        this.modules = null;
+        this.moduleCount = 0;
+        this.dataCache = null;
+        this.dataList = [];
+      }
+      QRCodeModel.prototype = {
+        addData: function(data) {
+          let entry = new QR8BitByte(data);
+          this.dataList.push(entry);
+          this.dataCache = null;
+        },
+        isDark: function(row, col) {
+          if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
+            throw new Error(row + "," + col);
+          }
+          return this.modules[row][col];
+        },
+        getModuleCount: function() { return this.moduleCount; },
+        make: function() {
+          if (this.typeNumber < 1) {
+            let typeNumber = 1;
+            for (typeNumber = 1; typeNumber < 40; typeNumber++) {
+              let rsBlocks = QRRSBlock.getRSBlocks(typeNumber, this.errorCorrectLevel);
+              let buffer = new QRBitBuffer();
+              let totalDataCount = 0;
+              for (let i = 0; i < rsBlocks.length; i++) totalDataCount += rsBlocks[i].dataCount;
+              for (let i = 0; i < this.dataList.length; i++) {
+                let data = this.dataList[i];
+                buffer.put(data.mode, 4);
+                buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber));
+                data.write(buffer);
+              }
+              if (buffer.getLengthInBits() <= totalDataCount * 8) break;
+            }
+            this.typeNumber = typeNumber;
+          }
+          this.makeImpl(false, this.getBestMaskPattern());
+        },
+        makeImpl: function(test, maskPattern) {
+          this.moduleCount = this.typeNumber * 4 + 17;
+          this.modules = new Array(this.moduleCount);
+          for (let row = 0; row < this.moduleCount; row++) {
+            this.modules[row] = new Array(this.moduleCount);
+            for (let col = 0; col < this.moduleCount; col++) this.modules[row][col] = null;
+          }
+          this.setupPositionProbePattern(0, 0);
+          this.setupPositionProbePattern(this.moduleCount - 7, 0);
+          this.setupPositionProbePattern(0, this.moduleCount - 7);
+          this.setupPositionAdjustPattern();
+          this.setupTimingPattern();
+          this.setupTypeInfo(test, maskPattern);
+          if (this.typeNumber >= 7) this.setupTypeNumber(test);
+          if (this.dataCache == null) this.dataCache = QRCodeModel.createData(this.typeNumber, this.errorCorrectLevel, this.dataList);
+          this.mapData(this.dataCache, maskPattern);
+        },
+        setupPositionProbePattern: function(row, col) {
+          for (let r = -1; r <= 7; r++) {
+            if (row + r <= -1 || this.moduleCount <= row + r) continue;
+            for (let c = -1; c <= 7; c++) {
+              if (col + c <= -1 || this.moduleCount <= col + c) continue;
+              if ((0 <= r && r <= 6 && (c == 0 || c == 6)) || (0 <= c && c <= 6 && (r == 0 || r == 6)) || (2 <= r && r <= 4 && 2 <= c && c <= 4)) {
+                this.modules[row + r][col + c] = true;
+              } else {
+                this.modules[row + r][col + c] = false;
+              }
+            }
+          }
+        },
+        getBestMaskPattern: function() {
+          let minLostPoint = 0;
+          let pattern = 0;
+          for (let i = 0; i < 8; i++) {
+            this.makeImpl(true, i);
+            let lostPoint = QRUtil.getLostPoint(this);
+            if (i == 0 || minLostPoint > lostPoint) {
+              minLostPoint = lostPoint;
+              pattern = i;
+            }
+          }
+          return pattern;
+        },
+        setupTimingPattern: function() {
+          for (let r = 8; r < this.moduleCount - 8; r++) {
+            if (this.modules[r][6] != null) continue;
+            this.modules[r][6] = (r % 2 == 0);
+          }
+          for (let c = 8; c < this.moduleCount - 8; c++) {
+            if (this.modules[6][c] != null) continue;
+            this.modules[6][c] = (c % 2 == 0);
+          }
+        },
+        setupPositionAdjustPattern: function() {
+          let pos = QRUtil.getPatternPosition(this.typeNumber);
+          for (let i = 0; i < pos.length; i++) {
+            for (let j = 0; j < pos.length; j++) {
+              let row = pos[i];
+              let col = pos[j];
+              if (this.modules[row][col] != null) continue;
+              for (let r = -2; r <= 2; r++) {
+                for (let c = -2; c <= 2; c++) {
+                  if (r == -2 || r == 2 || c == -2 || c == 2 || (r == 0 && c == 0)) {
+                    this.modules[row + r][col + c] = true;
+                  } else {
+                    this.modules[row + r][col + c] = false;
+                  }
+                }
+              }
+            }
+          }
+        },
+        setupTypeInfo: function(test, maskPattern) {
+          let data = (this.errorCorrectLevel << 3) | maskPattern;
+          let bits = QRUtil.getBCHTypeInfo(data);
+          for (let i = 0; i < 15; i++) {
+            let mod = (!test && ((bits >> i) & 1) == 1);
+            if (i < 6) this.modules[i][8] = mod;
+            else if (i < 8) this.modules[i + 1][8] = mod;
+            else this.modules[this.moduleCount - 15 + i][8] = mod;
+          }
+          for (let i = 0; i < 15; i++) {
+            let mod = (!test && ((bits >> i) & 1) == 1);
+            if (i < 8) this.modules[8][this.moduleCount - i - 1] = mod;
+            else if (i == 8) this.modules[8][7] = mod;
+            else this.modules[8][15 - i - 1] = mod;
+          }
+          this.modules[this.moduleCount - 8][8] = !test;
+        },
+        setupTypeNumber: function(test) {
+          let bits = QRUtil.getBCHTypeNumber(this.typeNumber);
+          for (let i = 0; i < 18; i++) {
+            let mod = (!test && ((bits >> i) & 1) == 1);
+            this.modules[Math.floor(i / 3)][i % 3 + this.moduleCount - 8 - 3] = mod;
+            this.modules[i % 3 + this.moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
+          }
+        },
+        mapData: function(data, maskPattern) {
+          let inc = -1;
+          let row = this.moduleCount - 1;
+          let bitIndex = 7;
+          let byteIndex = 0;
+          for (let col = this.moduleCount - 1; col > 0; col -= 2) {
+            if (col == 6) col--;
+            while (true) {
+              for (let c = 0; c < 2; c++) {
+                if (this.modules[row][col - c] == null) {
+                  let dark = false;
+                  if (byteIndex < data.length) dark = (((data[byteIndex] >>> bitIndex) & 1) == 1);
+                  let mask = QRUtil.getMask(maskPattern, row, col - c);
+                  if (mask) dark = !dark;
+                  this.modules[row][col - c] = dark;
+                  bitIndex--;
+                  if (bitIndex == -1) {
+                    byteIndex++;
+                    bitIndex = 7;
+                  }
+                }
+              }
+              row += inc;
+              if (row < 0 || this.moduleCount <= row) {
+                row -= inc;
+                inc = -inc;
+                break;
+              }
+            }
+          }
+        }
+      };
+
+      QRCodeModel.createData = function(typeNumber, errorCorrectLevel, dataList) {
+        let rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
+        let buffer = new QRBitBuffer();
+        for (let i = 0; i < dataList.length; i++) {
+          let data = dataList[i];
+          buffer.put(data.mode, 4);
+          buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber));
+          data.write(buffer);
+        }
+        let totalDataCount = 0;
+        for (let i = 0; i < rsBlocks.length; i++) totalDataCount += rsBlocks[i].dataCount;
+        if (buffer.getLengthInBits() > totalDataCount * 8) {
+          throw new Error("Content exceeds QR capacity for version " + typeNumber);
+        }
+        if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) buffer.put(0, 4);
+        while (buffer.getLengthInBits() % 8 != 0) buffer.putBit(false);
+        while (true) {
+          if (buffer.getLengthInBits() >= totalDataCount * 8) break;
+          buffer.put(0xEC, 8);
+          if (buffer.getLengthInBits() >= totalDataCount * 8) break;
+          buffer.put(0x11, 8);
+        }
+        return QRCodeModel.createBytes(buffer, rsBlocks);
+      };
+
+      QRCodeModel.createBytes = function(buffer, rsBlocks) {
+        let offset = 0;
+        let maxDcCount = 0;
+        let maxEcCount = 0;
+        let dcdata = new Array(rsBlocks.length);
+        let ecdata = new Array(rsBlocks.length);
+        for (let r = 0; r < rsBlocks.length; r++) {
+          let dcCount = rsBlocks[r].dataCount;
+          let ecCount = rsBlocks[r].totalCount - dcCount;
+          maxDcCount = Math.max(maxDcCount, dcCount);
+          maxEcCount = Math.max(maxEcCount, ecCount);
+          dcdata[r] = new Array(dcCount);
+          for (let i = 0; i < dcdata[r].length; i++) dcdata[r][i] = 0xff & buffer.buffer[i + offset];
+          offset += dcCount;
+          let rsPoly = QRUtil.getErrorCorrectionPolynomial(ecCount);
+          let rawPoly = new QRPolynomial(dcdata[r], rsPoly.getLength() - 1);
+          let modPoly = rawPoly.mod(rsPoly);
+          ecdata[r] = new Array(rsPoly.getLength() - 1);
+          for (let i = 0; i < ecdata[r].length; i++) {
+            let modIndex = i + modPoly.getLength() - ecdata[r].length;
+            ecdata[r][i] = (modIndex >= 0) ? modPoly.get(modIndex) : 0;
+          }
+        }
+        let totalCodeCount = 0;
+        for (let i = 0; i < rsBlocks.length; i++) totalCodeCount += rsBlocks[i].totalCount;
+        let data = new Array(totalCodeCount);
+        let index = 0;
+        for (let i = 0; i < maxDcCount; i++) {
+          for (let r = 0; r < rsBlocks.length; r++) {
+            if (i < dcdata[r].length) data[index++] = dcdata[r][i];
+          }
+        }
+        for (let i = 0; i < maxEcCount; i++) {
+          for (let r = 0; r < rsBlocks.length; r++) {
+            if (i < ecdata[r].length) data[index++] = ecdata[r][i];
+          }
+        }
+        return data;
+      };
+
+      return {
+        generate: function(text, ecLevel = 2) {
+          let qr = new QRCodeModel(0, ecLevel);
+          qr.addData(text);
+          qr.make();
+          return qr;
+        },
+        CorrectLevel: { L: 1, M: 0, Q: 3, H: 2 }
+      };
+    })();
+
+    /* ==========================================================================
+       2. Application State & Frame Definitions
+       ========================================================================== */
+    const state = {
+      contentType: 'url',
+      formattedData: 'https://google.com',
+      color1: '#0f172a',
+      color2: '#4f46e5',
+      useGradient: false,
+      gradientType: 'linear',
+      bgColor: '#ffffff',
+      isTransparent: false,
+      dotStyle: 'square',
+      eyeFrame: 'square',
+      eyeBall: 'square',
+      customEyeColor: false,
+      eyeOuterColor: '#4f46e5',
+      eyeInnerColor: '#dc2626',
+      frameId: 'frame_none',
+      frameCategory: 'general',
+      frameText: 'SCAN ME',
+      frameColor: '#4f46e5',
+      frameTextColor: '#ffffff',
+      logoPreset: 'none',
+      customLogoUrl: null,
+      logoSize: 22,
+      logoRemoveBg: true,
+      errorCorrection: QRCodeLib.CorrectLevel.H
+    };
+
+    /* Categories matching uploaded images 1, 2, and 3 */
+    const FRAME_CATEGORIES = [
+      {
+        id: "general",
+        name: "Modern & Standard",
+        icon: "🏷️",
+        frames: [
+          { id: "frame_none", name: "No Frame", text: "" },
+          { id: "frame_bottom_banner", name: "Bottom Banner", text: "SCAN ME" },
+          { id: "frame_top_banner", name: "Top Badge", text: "SCAN ME" },
+          { id: "frame_bubble", name: "Speech Bubble", text: "LET'S CHAT" },
+          { id: "frame_polaroid", name: "Polaroid Card", text: "PHOTO MEMORY" },
+          { id: "frame_phone", name: "Smartphone", text: "OPEN IN PHONE" },
+          { id: "frame_shop_bag", name: "Shopping Bag", text: "SHOP NOW!" },
+          { id: "frame_coffee_cup", name: "Coffee Cup", text: "HOT BREW" }
+        ]
+      },
+      {
+        id: "tet",
+        name: "Vietnamese New Year",
+        icon: "🌸",
+        frames: [
+          { id: "vn_mai_garland", name: "Mai Blossom Garland", text: "CHÚC MỪNG NĂM MỚI", color: "#eab308" },
+          { id: "vn_tet_lantern", name: "Red Lantern Arch", text: "VẠN SỰ NHƯ Ý", color: "#dc2626" },
+          { id: "vn_tet_wreath", name: "Tet Floral Wreath", text: "TẾT SUM VẦY", color: "#16a34a" },
+          { id: "vn_banh_chung", name: "Bánh Chưng Bamboo", text: "AN KHANG THỊNH VƯỢNG", color: "#15803d" },
+          { id: "vn_peach_branch", name: "Peach Blossom Branch", text: "XUÂN ĐẮC LỘC", color: "#ec4899" },
+          { id: "vn_kumquat_bowl", name: "Kumquat Bowl Frame", text: "TẤN TÀI TẤN LỘC", color: "#b91c1c" }
+        ]
+      },
+      {
+        id: "cny",
+        name: "Chinese New Year",
+        icon: "🏮",
+        frames: [
+          { id: "cny_lantern_arch", name: "Red Lantern Arch", text: "GONG XI FA CAI", color: "#b91c1c" },
+          { id: "cny_gold_ingots", name: "Gold Ingot & Coins", text: "PROSPERITY", color: "#d97706" },
+          { id: "cny_round_fan", name: "Oriental Fan Frame", text: "CHINESE NEW YEAR", color: "#dc2626" },
+          { id: "cny_paper_cut", name: "Paper-Cut Rosette", text: "SPRING FESTIVAL", color: "#991b1b" },
+          { id: "cny_pavilion", name: "Imperial Pavilion", text: "FORTUNE & JOY", color: "#ca8a04" },
+          { id: "cny_double_happiness", name: "Double Happiness", text: "BLESSINGS", color: "#e11d48" }
+        ]
+      },
+      {
+        id: "newyear",
+        name: "New Year",
+        icon: "❄️",
+        frames: [
+          { id: "ny_pine_garland", name: "Pine & Berries", text: "HAPPY NEW YEAR", color: "#16a34a" },
+          { id: "ny_champagne", name: "Champagne Flutes", text: "CHEERS TO 2026", color: "#0891b2" },
+          { id: "ny_ribbon_bow", name: "Holiday Gift Bow", text: "SEASON'S GREETINGS", color: "#f43f5e" },
+          { id: "ny_frosted_pine", name: "Frosted Pine Wreath", text: "WINTER WONDERLAND", color: "#0d9488" },
+          { id: "ny_candy_cane", name: "Candy Cane Border", text: "JOY & PEACE", color: "#e11d48" },
+          { id: "ny_gift_parcel", name: "Holiday Gift Box", text: "SPECIAL SURPRISE", color: "#ea580c" },
+          { id: "ny_clock_stars", name: "Midnight Clock & Stars", text: "COUNTDOWN", color: "#4f46e5" },
+          { id: "ny_ornament", name: "Bauble Ornament", text: "MERRY & BRIGHT", color: "#b91c1c" },
+          { id: "ny_hot_cocoa", name: "Hot Cocoa Mug", text: "WARM WISHES", color: "#b45309" },
+          { id: "ny_snowflake_frame", name: "Snowflake Frost", text: "LET IT SNOW", color: "#0284c7" }
+        ]
+      },
+      {
+        id: "wedding",
+        name: "Wedding Day",
+        icon: "💍",
+        frames: [
+          { id: "wedding_rings", name: "Entwined Gold Rings", text: "SAVE THE DATE", color: "#d97706" },
+          { id: "wedding_laurel", name: "Laurel Branch Wreath", text: "JUST MARRIED", color: "#65a30d" },
+          { id: "wedding_eucalyptus", name: "Eucalyptus Leaves", text: "OUR WEDDING", color: "#0d9488" },
+          { id: "wedding_blossoms", name: "Blush Blossom Wreath", text: "LOVE & FOREVER", color: "#db2777" },
+          { id: "wedding_geometric", name: "Rose Gold Geometric", text: "WE DO", color: "#e11d48" },
+          { id: "wedding_polaroid", name: "Polaroid Keepsake", text: "THE PERFECT DAY", color: "#475569" }
+        ]
+      },
+      {
+        id: "anniversary",
+        name: "Anniversary",
+        icon: "💖",
+        frames: [
+          { id: "anniv_heart_ribbon", name: "Heart Ribbon Frame", text: "HAPPY ANNIVERSARY", color: "#e11d48" },
+          { id: "anniv_double_rings", name: "Double Rings Bow", text: "TOGETHER FOREVER", color: "#2563eb" },
+          { id: "anniv_interlocking_hearts", name: "Interlocking Hearts", text: "ALWAYS YOU", color: "#dc2626" },
+          { id: "anniv_rose_garland", name: "Rose Garland", text: "SWEET MEMORIES", color: "#be123c" },
+          { id: "anniv_lavender", name: "Lavender Floral Circle", text: "ENDLESS LOVE", color: "#7c3aed" },
+          { id: "anniv_radiant_heart", name: "Radiant Red Heart", text: "WITH ALL MY HEART", color: "#ef4444" }
+        ]
+      },
+      {
+        id: "birthday",
+        name: "Birthday",
+        icon: "🎂",
+        frames: [
+          { id: "bday_balloons", name: "Party Balloons", text: "HAPPY BIRTHDAY!", color: "#8b5cf6" },
+          { id: "bday_cake", name: "Birthday Cake", text: "MAKE A WISH", color: "#ec4899" },
+          { id: "bday_starburst", name: "Confetti Starburst", text: "PARTY TIME", color: "#f59e0b" },
+          { id: "bday_bunting", name: "Party Bunting Flags", text: "CELEBRATE!", color: "#ea580c" },
+          { id: "bday_pastel_confetti", name: "Pastel Confetti", text: "HAVE A BLAST", color: "#06b6d4" },
+          { id: "bday_gift_bow", name: "Birthday Gift Bow", text: "FOR YOU", color: "#10b981" }
+        ]
+      },
+      {
+        id: "child_bday",
+        name: "Child's Birthday",
+        icon: "🍼",
+        frames: [
+          { id: "child_onesie", name: "Baby Onesie Motif", text: "LITTLE ONE", color: "#ec4899" },
+          { id: "child_pink_rattle", name: "Pink Rattle & Heart", text: "BABY GIRL", color: "#f43f5e" },
+          { id: "child_blue_booties", name: "Blue Booties & Stars", text: "BABY BOY", color: "#3b82f6" },
+          { id: "child_stroller", name: "Baby Stroller Pram", text: "SWEET BABY", color: "#06b6d4" },
+          { id: "child_rocking_horse", name: "Nursery Rocking Horse", text: "FIRST BIRTHDAY", color: "#8b5cf6" },
+          { id: "child_toy_blocks", name: "Pastel Toy Blocks", text: "GROWING FAST", color: "#10b981" }
+        ]
+      },
+      {
+        id: "columbus",
+        name: "Columbus Day",
+        icon: "⛵",
+        frames: [
+          { id: "columbus_caravel", name: "Caravel Sailing Ship", text: "VOYAGE OF DISCOVERY", color: "#b45309" },
+          { id: "columbus_helm", name: "Ship Captain Helm", text: "EXPLORE THE SEAS", color: "#1d4ed8" },
+          { id: "columbus_compass", name: "Compass Rose Sunburst", text: "NAVIGATE", color: "#92400e" },
+          { id: "columbus_galleon", name: "Historic Galleon", text: "ADVENTURE", color: "#78350f" },
+          { id: "columbus_anchor", name: "Nautical Flag & Anchor", text: "NEW HORIZONS", color: "#b91c1c" },
+          { id: "columbus_map", name: "Vintage Sea Map", text: "CHART YOUR COURSE", color: "#c2410c" }
+        ]
+      },
+      {
+        id: "holi",
+        name: "Holi - Festival Of Colors",
+        icon: "🎨",
+        frames: [
+          { id: "holi_powder_burst", name: "Gulal Powder Burst", text: "HOLI HAI!", color: "#ec4899" },
+          { id: "holi_handprint", name: "Color Handprint & Pot", text: "FESTIVAL OF COLORS", color: "#84cc16" },
+          { id: "holi_splatter_arch", name: "Color Splatter Arch", text: "HAPPY HOLI", color: "#f97316" },
+          { id: "holi_triangle_bunting", name: "Rainbow Bunting", text: "JOYOUS COLORS", color: "#06b6d4" },
+          { id: "holi_palette", name: "Gulal Thali Palette", text: "SPREAD LOVE", color: "#8b5cf6" },
+          { id: "holi_pichkari", name: "Pichkari & Gulal Pot", text: "HOLI CELEBRATION", color: "#e11d48" }
+        ]
+      },
+      {
+        id: "carnival",
+        name: "Brazilian Carnival",
+        icon: "🎭",
+        frames: [
+          { id: "carnival_mask", name: "Samba Carnival Mask", text: "CARNAVAL DO BRASIL", color: "#9333ea" },
+          { id: "carnival_teal_plumes", name: "Tropical Plumes", text: "SAMBA & JOY", color: "#0d9488" },
+          { id: "carnival_crown", name: "Carnival Crown", text: "VIVA O CARNAVAL", color: "#f59e0b" },
+          { id: "carnival_drums", name: "Samba Drums & Maracas", text: "FEEL THE BEAT", color: "#b45309" },
+          { id: "carnival_streamers", name: "Golden Confetti Lights", text: "CARNIVAL MAGIC", color: "#eab308" },
+          { id: "carnival_cocktail", name: "Tropical Cocktail", text: "TROPICAL PARTY", color: "#ec4899" }
+        ]
+      },
+      {
+        id: "thanksgiving",
+        name: "Thanksgiving Day",
+        icon: "🍂",
+        frames: [
+          { id: "thanks_pumpkins", name: "Autumn Pumpkins", text: "HAPPY THANKSGIVING", color: "#ea580c" },
+          { id: "thanks_oak_leaves", name: "Rustic Fall Oak Leaves", text: "GRATEFUL & BLESSED", color: "#b45309" },
+          { id: "thanks_wreath", name: "Harvest Apple Wreath", text: "GIVE THANKS", color: "#b91c1c" },
+          { id: "thanks_maple_arch", name: "Golden Maple Foliage", text: "AUTUMN HARVEST", color: "#c2410c" },
+          { id: "thanks_cornucopia", name: "Horn of Plenty", text: "COUNT BLESSINGS", color: "#92400e" },
+          { id: "thanks_pumpkin_vine", name: "Pumpkin Patch Vine", text: "THANKFUL HEARTS", color: "#15803d" }
+        ]
+      },
+      {
+        id: "harvest",
+        name: "Harvest Festival",
+        icon: "🌾",
+        frames: [
+          { id: "harvest_wheat", name: "Golden Wheat Sheaves", text: "BOUNTIFUL HARVEST", color: "#d97706" },
+          { id: "harvest_straw", name: "Woven Straw Frame", text: "HARVEST BLESSINGS", color: "#ca8a04" },
+          { id: "harvest_sunflowers", name: "Sunflower Bloom", text: "SUNSHINE & CROPS", color: "#eab308" },
+          { id: "harvest_window", name: "Country Farm Window", text: "MEADOW BREEZE", color: "#0284c7" },
+          { id: "harvest_cider", name: "Apple Cider Jar", text: "SWEET CIDER", color: "#78350f" },
+          { id: "harvest_garland", name: "Wildflower Garland", text: "AUTUMN BLOSSOMS", color: "#65a30d" }
+        ]
+      },
+      {
+        id: "hungkings",
+        name: "Hung Kings Festival",
+        icon: "🏛️",
+        frames: [
+          { id: "hung_temple_gate", name: "Hùng Temple Gate", text: "GIỖ TỔ HÙNG VƯƠNG", color: "#b91c1c" },
+          { id: "hung_bronze_drum", name: "Đông Sơn Bronze Drum", text: "CỘI NGUỒN DÂN TỘC", color: "#d97706" },
+          { id: "hung_jade_frame", name: "Royal Jade Frame", text: "NON SÔNG GẤM VÓC", color: "#15803d" },
+          { id: "hung_altar", name: "Ceremonial Altar Urn", text: "LINH KHÍ TRỜI ĐẤT", color: "#ea580c" },
+          { id: "hung_bronze_fan", name: "Ceremonial Bronze Fan", text: "TRI ÂN TIÊN TỔ", color: "#ca8a04" },
+          { id: "hung_flame", name: "Sacred Eternal Flame", text: "BÁCH VIỆT VỮNG BỀN", color: "#dc2626" }
+        ]
+      },
+      {
+        id: "indo_indep",
+        name: "Indonesia Independence",
+        icon: "🇮🇩",
+        frames: [
+          { id: "indo_merdeka_crest", name: "Merah Putih Crest", text: "17 AGUSTUS MERDEKA", color: "#dc2626" },
+          { id: "indo_flag_arch", name: "Bendera Merah Putih Arch", text: "INDONESIA MAJU", color: "#b91c1c" },
+          { id: "indo_garuda_ribbon", name: "Garuda 1945 Ribbon", text: "HUT REPUBLIK INDONESIA", color: "#d97706" },
+          { id: "indo_monas", name: "Monas Monument Frame", text: "KEMERDEKAAN", color: "#dc2626" },
+          { id: "indo_bunting", name: "Merah Putih Bunting", text: "DIRGAHAYU RI", color: "#991b1b" },
+          { id: "indo_gapura", name: "Gapura Merdeka Gate", text: "SEMANGAT MERDEKA", color: "#b91c1c" }
+        ]
+      },
+      {
+        id: "pancasila",
+        name: "Panchashila Day",
+        icon: "🛡️",
+        frames: [
+          { id: "pancasila_shield", name: "Pancasila Shield Border", text: "HARI LAHIR PANCASILA", color: "#dc2626" },
+          { id: "pancasila_garuda", name: "Garuda Emblem Base", text: "PANCASILA ABADI", color: "#d97706" },
+          { id: "pancasila_star_chain", name: "Golden Star & Chain", text: "KETUHANAN & PERSATUAN", color: "#eab308" },
+          { id: "pancasila_rice_cotton", name: "Padi & Kapas Prosperity", text: "KEADILAN SOSIAL", color: "#16a34a" },
+          { id: "pancasila_national_crest", name: "National Shield Crest", text: "GARUDA DI DADAKU", color: "#b91c1c" },
+          { id: "pancasila_bhinneka", name: "Bhinneka Tunggal Ika", text: "BERBEDA TETAP SATU", color: "#dc2626" }
+        ]
+      },
+      {
+        id: "fathers_day",
+        name: "Father's Day",
+        icon: "👔",
+        frames: [
+          { id: "dad_mustache_hat", name: "Bowler Hat & Mustache", text: "BEST DAD EVER", color: "#0f766e" },
+          { id: "dad_starburst", name: "Comic Starburst Badge", text: "SUPER DAD!", color: "#ea580c" },
+          { id: "dad_neckties", name: "Vintage Neckties Pattern", text: "HAPPY FATHER'S DAY", color: "#4f46e5" },
+          { id: "dad_luggage_tag", name: "Classic Luggage Tag", text: "TO MY HERO", color: "#0284c7" },
+          { id: "dad_fedora", name: "Fedora Hat & Suspenders", text: "NO. 1 DAD", color: "#164e63" },
+          { id: "dad_coffee", name: "Gentleman Watch & Coffee", text: "WORLD'S BEST DAD", color: "#0e7490" }
+        ]
+      },
+      {
+        id: "songkran",
+        name: "Songkran - Thai New Year",
+        icon: "💦",
+        frames: [
+          { id: "songkran_splash", name: "Water Splash Waves", text: "HAPPY SONGKRAN", color: "#0284c7" },
+          { id: "songkran_silver_bowl", name: "Silver Jasmine Bowl", text: "SAWASDEE PEE MAI", color: "#0891b2" },
+          { id: "songkran_water_gun", name: "Songkran Water Blaster", text: "SPLASH & JOY", color: "#ec4899" },
+          { id: "songkran_garland", name: "Dok Mali Garland", text: "WATER FESTIVAL", color: "#7c3aed" }
+        ]
+      }
+    ];
+
+    /* Preset Design Templates (Matching Image 1 top) */
+    const DESIGN_TEMPLATES = [
+      { name: "Monochrome Clean", c1: "#0f172a", c2: "#0f172a", bg: "#ffffff", dot: "square", eyeF: "square", eyeB: "square", frame: "frame_none", text: "" },
+      { name: "Sapphire Tech", c1: "#1d4ed8", c2: "#3b82f6", grad: true, bg: "#ffffff", dot: "rounded", eyeF: "rounded", eyeB: "circle", frame: "frame_none", text: "" },
+      { name: "Emerald Fresh", c1: "#059669", c2: "#10b981", grad: true, bg: "#ffffff", dot: "leaf", eyeF: "leaf", eyeB: "circle", frame: "frame_none", text: "" },
+      { name: "Sunset Coral", c1: "#ea580c", c2: "#f97316", grad: true, bg: "#ffffff", dot: "dots", eyeF: "circle", eyeB: "circle", frame: "frame_none", text: "" },
+      { name: "Royal Velvet", c1: "#7c3aed", c2: "#c084fc", grad: true, bg: "#ffffff", dot: "rounded", eyeF: "rounded", eyeB: "rounded", frame: "frame_none", text: "" },
+      { name: "Golden Amber", c1: "#d97706", c2: "#fbbf24", grad: true, bg: "#ffffff", dot: "diamond", eyeF: "square", eyeB: "diamond", frame: "frame_none", text: "" },
+      { name: "Cyberpunk Magenta", c1: "#db2777", c2: "#8b5cf6", grad: true, bg: "#ffffff", dot: "dots", eyeF: "circle", eyeB: "circle", frame: "frame_none", text: "" },
+      { name: "Artisan Coffee", c1: "#78350f", c2: "#92400e", grad: false, bg: "#ffffff", dot: "square", eyeF: "rounded", eyeB: "square", frame: "frame_coffee_cup", text: "HOT BREW", fColor: "#78350f" },
+      { name: "Scan Me Navy", c1: "#1e3a8a", c2: "#3b82f6", grad: false, bg: "#ffffff", dot: "rounded", eyeF: "rounded", eyeB: "circle", frame: "frame_bottom_banner", text: "SCAN ME", fColor: "#1e3a8a" },
+      { name: "Scan Me Orange", c1: "#ea580c", c2: "#f97316", grad: false, bg: "#ffffff", dot: "dots", eyeF: "circle", eyeB: "circle", frame: "frame_bottom_banner", text: "SCAN ME", fColor: "#ea580c" },
+      { name: "Chat Bubble", c1: "#059669", c2: "#10b981", grad: false, bg: "#ffffff", dot: "rounded", eyeF: "rounded", eyeB: "rounded", frame: "frame_bubble", text: "LET'S CHAT", fColor: "#059669" },
+      { name: "Shop Now Tag", c1: "#9333ea", c2: "#c084fc", grad: false, bg: "#ffffff", dot: "rounded", eyeF: "circle", eyeB: "circle", frame: "frame_shop_bag", text: "SHOP NOW!", fColor: "#9333ea" },
+      { name: "Polaroid Keepsake", c1: "#334155", c2: "#475569", grad: false, bg: "#ffffff", dot: "square", eyeF: "square", eyeB: "square", frame: "frame_polaroid", text: "MEMORIES", fColor: "#475569" },
+      { name: "Tet Apricot Blossom", c1: "#b91c1c", c2: "#ea580c", grad: true, bg: "#ffffff", dot: "leaf", eyeF: "leaf", eyeB: "circle", frame: "vn_mai_garland", text: "CHÚC MỪNG NĂM MỚI", fColor: "#eab308" },
+      { name: "Chinese Lantern", c1: "#991b1b", c2: "#dc2626", grad: true, bg: "#ffffff", dot: "dots", eyeF: "circle", eyeB: "circle", frame: "cny_lantern_arch", text: "GONG XI FA CAI", fColor: "#dc2626" },
+      { name: "Holiday Pine", c1: "#15803d", c2: "#16a34a", grad: false, bg: "#ffffff", dot: "leaf", eyeF: "leaf", eyeB: "circle", frame: "ny_pine_garland", text: "HAPPY NEW YEAR", fColor: "#16a34a" },
+      { name: "Wedding Gold Rings", c1: "#b45309", c2: "#d97706", grad: false, bg: "#ffffff", dot: "rounded", eyeF: "rounded", eyeB: "circle", frame: "wedding_rings", text: "SAVE THE DATE", fColor: "#d97706" },
+      { name: "Romantic Heart", c1: "#be123c", c2: "#f43f5e", grad: true, bg: "#ffffff", dot: "dots", eyeF: "circle", eyeB: "circle", frame: "anniv_heart_ribbon", text: "HAPPY ANNIVERSARY", fColor: "#e11d48" },
+      { name: "Birthday Balloons", c1: "#7c3aed", c2: "#ec4899", grad: true, bg: "#ffffff", dot: "dots", eyeF: "circle", eyeB: "circle", frame: "bday_balloons", text: "HAPPY BIRTHDAY!", fColor: "#8b5cf6" },
+      { name: "Baby Girl Pink", c1: "#db2777", c2: "#f472b6", grad: false, bg: "#ffffff", dot: "rounded", eyeF: "rounded", eyeB: "circle", frame: "child_pink_rattle", text: "BABY GIRL", fColor: "#f43f5e" },
+      { name: "Holi Color Burst", c1: "#c026d3", c2: "#f97316", grad: true, bg: "#ffffff", dot: "dots", eyeF: "circle", eyeB: "circle", frame: "holi_powder_burst", text: "HOLI HAI!", fColor: "#ec4899" },
+      { name: "Carnival Samba", c1: "#7e22ce", c2: "#0d9488", grad: true, bg: "#ffffff", dot: "leaf", eyeF: "leaf", eyeB: "circle", frame: "carnival_mask", text: "CARNAVAL DO BRASIL", fColor: "#9333ea" },
+      { name: "Merdeka Red & White", c1: "#b91c1c", c2: "#dc2626", grad: false, bg: "#ffffff", dot: "rounded", eyeF: "square", eyeB: "circle", frame: "indo_merdeka_crest", text: "17 AGUSTUS MERDEKA", fColor: "#dc2626" },
+      { name: "Best Dad Mustache", c1: "#0f766e", c2: "#14b8a6", grad: false, bg: "#ffffff", dot: "rounded", eyeF: "rounded", eyeB: "rounded", frame: "dad_mustache_hat", text: "BEST DAD EVER", fColor: "#0f766e" }
+    ];
+
+    /* ==========================================================================
+       3. Frame Artwork SVG Generator
+       ========================================================================== */
+    function renderFrameSvg(frameId, innerQrSvg, text, fColor, tColor) {
+      const W = 500;
+      let H = 500;
+      let qrX = 50;
+      let qrY = 50;
+      let qrSize = 400;
+      let decorations = "";
+      let textElement = "";
+
+      fColor = fColor || "#4f46e5";
+      tColor = tColor || "#ffffff";
+      text = text || "";
+
+      // Determine dimensions based on frame structure
+      if (frameId === "frame_none") {
+        return innerQrSvg; // Bare QR code
+      }
+
+      if (frameId === "frame_bottom_banner") {
+        H = 560;
+        qrX = 50;
+        qrY = 40;
+        qrSize = 400;
+        decorations = `
+          <rect x="25" y="20" width="450" height="520" rx="24" fill="#ffffff" stroke="${fColor}" stroke-width="4"/>
+          <path d="M 45 460 Q 45 450 55 450 L 445 450 Q 455 450 455 460 L 455 520 Q 455 530 445 530 L 55 530 Q 45 530 45 520 Z" fill="${fColor}"/>
+        `;
+        textElement = `<text x="250" y="496" fill="${tColor}" font-family="sans-serif" font-weight="800" font-size="22" letter-spacing="2" text-anchor="middle">${escapeXml(text)}</text>`;
+      }
+      else if (frameId === "frame_top_banner") {
+        H = 560;
+        qrX = 50;
+        qrY = 120;
+        qrSize = 400;
+        decorations = `
+          <rect x="25" y="20" width="450" height="520" rx="24" fill="#ffffff" stroke="${fColor}" stroke-width="4"/>
+          <path d="M 45 40 Q 45 30 55 30 L 445 30 Q 455 30 455 40 L 455 100 Q 455 110 445 110 L 55 110 Q 45 110 45 100 Z" fill="${fColor}"/>
+        `;
+        textElement = `<text x="250" y="78" fill="${tColor}" font-family="sans-serif" font-weight="800" font-size="22" letter-spacing="2" text-anchor="middle">${escapeXml(text)}</text>`;
+      }
+      else if (frameId === "frame_bubble") {
+        H = 580;
+        qrX = 50;
+        qrY = 40;
+        qrSize = 400;
+        decorations = `
+          <rect x="25" y="20" width="450" height="480" rx="28" fill="#ffffff" stroke="${fColor}" stroke-width="4"/>
+          <path d="M 230 500 L 250 540 L 270 500 Z" fill="${fColor}"/>
+          <rect x="60" y="445" width="380" height="45" rx="12" fill="${fColor}"/>
+        `;
+        textElement = `<text x="250" y="475" fill="${tColor}" font-family="sans-serif" font-weight="800" font-size="20" letter-spacing="1" text-anchor="middle">${escapeXml(text)}</text>`;
+      }
+      else if (frameId === "frame_polaroid") {
+        H = 580;
+        qrX = 60;
+        qrY = 50;
+        qrSize = 380;
+        decorations = `
+          <rect x="30" y="25" width="440" height="530" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="3" filter="drop-shadow(0 8px 16px rgba(0,0,0,0.06))"/>
+          <rect x="52" y="42" width="396" height="396" rx="6" fill="#f8fafc"/>
+        `;
+        textElement = `<text x="250" y="500" fill="${fColor}" font-family="'Brush Script MT', cursive, sans-serif" font-weight="700" font-size="28" text-anchor="middle">${escapeXml(text)}</text>`;
+      }
+      else if (frameId === "frame_phone") {
+        H = 590;
+        qrX = 75;
+        qrY = 90;
+        qrSize = 350;
+        decorations = `
+          <rect x="50" y="20" width="400" height="550" rx="42" fill="#0f172a"/>
+          <rect x="58" y="28" width="384" height="534" rx="36" fill="#ffffff"/>
+          <!-- Notch/Speaker -->
+          <rect x="200" y="42" width="100" height="12" rx="6" fill="#334155"/>
+          <circle cx="180" cy="48" r="4" fill="#334155"/>
+          <!-- Home bar -->
+          <rect x="190" y="540" width="120" height="5" rx="3" fill="#cbd5e1"/>
+        `;
+        textElement = `<text x="250" y="495" fill="${fColor}" font-family="sans-serif" font-weight="800" font-size="18" letter-spacing="1" text-anchor="middle">${escapeXml(text)}</text>`;
+      }
+      else if (frameId === "frame_shop_bag") {
+        H = 570;
+        qrX = 65;
+        qrY = 110;
+        qrSize = 370;
+        decorations = `
+          <!-- Bag handles -->
+          <path d="M 180 100 Q 180 30 250 30 Q 320 30 320 100" fill="none" stroke="${fColor}" stroke-width="12" stroke-linecap="round"/>
+          <rect x="40" y="90" width="420" height="460" rx="20" fill="#ffffff" stroke="${fColor}" stroke-width="5"/>
+          <rect x="60" y="490" width="380" height="45" rx="10" fill="${fColor}"/>
+        `;
+        textElement = `<text x="250" y="520" fill="${tColor}" font-family="sans-serif" font-weight="800" font-size="20" letter-spacing="2" text-anchor="middle">${escapeXml(text)}</text>`;
+      }
+      else if (frameId === "frame_coffee_cup") {
+        H = 570;
+        qrX = 70;
+        qrY = 90;
+        qrSize = 360;
+        decorations = `
+          <!-- Steam lines -->
+          <path d="M 220 50 Q 210 30 220 15 M 250 50 Q 240 30 250 15 M 280 50 Q 270 30 280 15" fill="none" stroke="#ca8a04" stroke-width="4" stroke-linecap="round"/>
+          <!-- Cup body -->
+          <rect x="50" y="70" width="400" height="470" rx="24" fill="#ffffff" stroke="${fColor}" stroke-width="5"/>
+          <!-- Cup handle -->
+          <path d="M 450 160 C 495 160 495 320 450 320" fill="none" stroke="${fColor}" stroke-width="12" stroke-linecap="round"/>
+          <rect x="70" y="470" width="360" height="48" rx="12" fill="${fColor}"/>
+        `;
+        textElement = `<text x="250" y="502" fill="${tColor}" font-family="sans-serif" font-weight="800" font-size="20" letter-spacing="1" text-anchor="middle">${escapeXml(text)}</text>`;
+      }
+      // FESTIVE OCCASIONS
+      else if (frameId.startsWith("vn_") || frameId === "cny_lantern_arch" || frameId.startsWith("cny_")) {
+        H = 570;
+        qrX = 65;
+        qrY = 65;
+        qrSize = 370;
+        decorations = `
+          <rect x="30" y="25" width="440" height="520" rx="20" fill="#fffdfa" stroke="#dc2626" stroke-width="4"/>
+          <!-- Corner gold flourishes -->
+          <circle cx="55" cy="50" r="16" fill="#eab308"/>
+          <circle cx="445" cy="50" r="16" fill="#eab308"/>
+          <circle cx="55" cy="50" r="8" fill="#dc2626"/>
+          <circle cx="445" cy="50" r="8" fill="#dc2626"/>
+          <!-- Yellow Apricot / Tet Peach Blossoms -->
+          <circle cx="45" cy="200" r="9" fill="#facc15"/><circle cx="45" cy="230" r="11" fill="#facc15"/><circle cx="45" cy="260" r="9" fill="#facc15"/>
+          <circle cx="455" cy="200" r="9" fill="#facc15"/><circle cx="455" cy="230" r="11" fill="#facc15"/><circle cx="455" cy="260" r="9" fill="#facc15"/>
+          <!-- Hanging red lantern -->
+          <rect x="235" y="25" width="30" height="22" rx="8" fill="#b91c1c"/>
+          <line x1="250" y1="20" x2="250" y2="25" stroke="#ca8a04" stroke-width="2"/>
+          <line x1="250" y1="47" x2="250" y2="55" stroke="#ca8a04" stroke-width="2"/>
+          <!-- Bottom banner -->
+          <path d="M 50 480 Q 250 495 450 480 L 450 530 Q 250 545 50 530 Z" fill="#b91c1c"/>
+        `;
+        textElement = `<text x="250" y="514" fill="#fef08a" font-family="sans-serif" font-weight="900" font-size="19" letter-spacing="1" text-anchor="middle">${escapeXml(text)}</text>`;
+      }
+      else if (frameId.startsWith("ny_")) {
+        H = 570;
+        qrX = 65;
+        qrY = 65;
+        qrSize = 370;
+        decorations = `
+          <rect x="30" y="25" width="440" height="520" rx="20" fill="#ffffff" stroke="${fColor}" stroke-width="4"/>
+          <!-- Evergreen garland corners -->
+          <path d="M 30 80 Q 80 80 80 30" fill="none" stroke="#15803d" stroke-width="8" stroke-linecap="round"/>
+          <path d="M 470 80 Q 420 80 420 30" fill="none" stroke="#15803d" stroke-width="8" stroke-linecap="round"/>
+          <circle cx="75" cy="75" r="6" fill="#dc2626"/><circle cx="65" cy="85" r="5" fill="#dc2626"/>
+          <circle cx="425" cy="75" r="6" fill="#dc2626"/><circle cx="435" cy="85" r="5" fill="#dc2626"/>
+          <!-- Sparkling snowflakes -->
+          <text x="250" y="50" font-size="24" text-anchor="middle">❄️</text>
+          <!-- Bottom banner -->
+          <rect x="50" y="475" width="400" height="50" rx="12" fill="${fColor}"/>
+        `;
+        textElement = `<text x="250" y="507" fill="${tColor}" font-family="sans-serif" font-weight="800" font-size="19" letter-spacing="1" text-anchor="middle">${escapeXml(text)}</text>`;
+      }
+      else if (frameId.startsWith("wedding_") || frameId.startsWith("anniv_")) {
+        H = 570;
+        qrX = 65;
+        qrY = 65;
+        qrSize = 370;
+        decorations = `
+          <rect x="30" y="25" width="440" height="520" rx="24" fill="#fffafb" stroke="${fColor}" stroke-width="3"/>
+          <!-- Elegant heart/ring motif -->
+          <circle cx="236" cy="45" r="14" fill="none" stroke="#d97706" stroke-width="3"/>
+          <circle cx="264" cy="45" r="14" fill="none" stroke="#d97706" stroke-width="3"/>
+          <!-- Floral garland corners -->
+          <circle cx="55" cy="50" r="10" fill="#f472b6" opacity="0.8"/>
+          <circle cx="445" cy="50" r="10" fill="#f472b6" opacity="0.8"/>
+          <circle cx="55" cy="470" r="10" fill="#f472b6" opacity="0.8"/>
+          <circle cx="445" cy="470" r="10" fill="#f472b6" opacity="0.8"/>
+          <rect x="60" y="480" width="380" height="46" rx="23" fill="${fColor}"/>
+        `;
+        textElement = `<text x="250" y="510" fill="${tColor}" font-family="sans-serif" font-weight="800" font-size="19" letter-spacing="1" text-anchor="middle">${escapeXml(text)}</text>`;
+      }
+      else if (frameId.startsWith("bday_") || frameId.startsWith("child_")) {
+        H = 570;
+        qrX = 65;
+        qrY = 75;
+        qrSize = 370;
+        decorations = `
+          <rect x="30" y="25" width="440" height="520" rx="24" fill="#ffffff" stroke="${fColor}" stroke-width="4"/>
+          <!-- Colorful Party Balloons on top -->
+          <circle cx="215" cy="45" r="14" fill="#f43f5e"/>
+          <circle cx="250" cy="38" r="16" fill="#3b82f6"/>
+          <circle cx="285" cy="45" r="14" fill="#eab308"/>
+          <path d="M 215 59 L 245 75 M 250 54 L 250 75 M 285 59 L 255 75" stroke="#94a3b8" stroke-width="1.5"/>
+          <!-- Confetti sprinkles -->
+          <circle cx="65" cy="55" r="4" fill="#10b981"/><circle cx="435" cy="55" r="4" fill="#f43f5e"/>
+          <circle cx="55" cy="250" r="4" fill="#f59e0b"/><circle cx="445" cy="250" r="4" fill="#6366f1"/>
+          <!-- Bottom ribbon -->
+          <rect x="50" y="480" width="400" height="48" rx="14" fill="${fColor}"/>
+        `;
+        textElement = `<text x="250" y="512" fill="${tColor}" font-family="sans-serif" font-weight="800" font-size="20" letter-spacing="1" text-anchor="middle">${escapeXml(text)}</text>`;
+      }
+      else if (frameId.startsWith("holi_")) {
+        H = 570;
+        qrX = 65;
+        qrY = 65;
+        qrSize = 370;
+        decorations = `
+          <rect x="30" y="25" width="440" height="520" rx="24" fill="#ffffff" stroke="#ec4899" stroke-width="4"/>
+          <!-- Multi-color gulal powder splashes -->
+          <circle cx="45" cy="45" r="16" fill="#f43f5e"/><circle cx="68" cy="38" r="10" fill="#eab308"/>
+          <circle cx="455" cy="45" r="16" fill="#06b6d4"/><circle cx="432" cy="38" r="10" fill="#a855f7"/>
+          <circle cx="45" cy="250" r="12" fill="#84cc16"/><circle cx="455" cy="250" r="12" fill="#f97316"/>
+          <!-- Bottom vibrant banner -->
+          <rect x="50" y="475" width="400" height="50" rx="14" fill="url(#holiGrad)"/>
+          <defs>
+            <linearGradient id="holiGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#ec4899"/>
+              <stop offset="35%" stop-color="#8b5cf6"/>
+              <stop offset="70%" stop-color="#06b6d4"/>
+              <stop offset="100%" stop-color="#f59e0b"/>
+            </linearGradient>
+          </defs>
+        `;
+        textElement = `<text x="250" y="508" fill="#ffffff" font-family="sans-serif" font-weight="900" font-size="21" letter-spacing="2" text-anchor="middle">${escapeXml(text)}</text>`;
+      }
+      else if (frameId.startsWith("indo_") || frameId.startsWith("pancasila_")) {
+        H = 570;
+        qrX = 65;
+        qrY = 65;
+        qrSize = 370;
+        decorations = `
+          <rect x="30" y="25" width="440" height="520" rx="20" fill="#ffffff" stroke="#dc2626" stroke-width="4"/>
+          <!-- Bendera Merah Putih ribbons on top -->
+          <rect x="190" y="32" width="120" height="12" fill="#dc2626" rx="3"/>
+          <rect x="190" y="44" width="120" height="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" rx="3"/>
+          <!-- Golden Star / Garuda motif -->
+          <circle cx="250" cy="44" r="14" fill="#eab308"/>
+          <polygon points="250,33 253,42 262,42 255,47 258,56 250,51 242,56 245,47 238,42 247,42" fill="#ffffff"/>
+          <rect x="50" y="475" width="400" height="50" rx="12" fill="#dc2626"/>
+        `;
+        textElement = `<text x="250" y="508" fill="#ffffff" font-family="sans-serif" font-weight="900" font-size="19" letter-spacing="1" text-anchor="middle">${escapeXml(text)}</text>`;
+      }
+      else if (frameId.startsWith("dad_")) {
+        H = 570;
+        qrX = 65;
+        qrY = 85;
+        qrSize = 370;
+        decorations = `
+          <rect x="30" y="25" width="440" height="520" rx="24" fill="#f8fafc" stroke="${fColor}" stroke-width="4"/>
+          <!-- Bowler hat -->
+          <path d="M 210 50 C 210 25 290 25 290 50 Z" fill="#1e293b"/>
+          <rect x="195" y="48" width="110" height="6" rx="3" fill="#1e293b"/>
+          <!-- Handlebar mustache -->
+          <path d="M 250 64 C 240 58 220 58 215 65 C 225 74 245 68 250 64 Z" fill="#1e293b"/>
+          <path d="M 250 64 C 260 58 280 58 285 65 C 275 74 255 68 250 64 Z" fill="#1e293b"/>
+          <rect x="50" y="480" width="400" height="48" rx="12" fill="${fColor}"/>
+        `;
+        textElement = `<text x="250" y="512" fill="${tColor}" font-family="sans-serif" font-weight="900" font-size="20" letter-spacing="2" text-anchor="middle">${escapeXml(text)}</text>`;
+      }
+      else {
+        // General themed fallback for other categories (Thanksgiving, Harvest, Songkran, etc.)
+        H = 570;
+        qrX = 65;
+        qrY = 65;
+        qrSize = 370;
+        decorations = `
+          <rect x="30" y="25" width="440" height="520" rx="22" fill="#ffffff" stroke="${fColor}" stroke-width="4"/>
+          <!-- Corner circles -->
+          <circle cx="55" cy="50" r="10" fill="${fColor}"/>
+          <circle cx="445" cy="50" r="10" fill="${fColor}"/>
+          <rect x="50" y="475" width="400" height="50" rx="14" fill="${fColor}"/>
+        `;
+        textElement = `<text x="250" y="508" fill="${tColor}" font-family="sans-serif" font-weight="800" font-size="19" letter-spacing="1" text-anchor="middle">${escapeXml(text)}</text>`;
+      }
+
+      return `
+        <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+          ${decorations}
+          <g transform="translate(${qrX}, ${qrY})">
+            ${innerQrSvg}
+          </g>
+          ${textElement}
+        </svg>
+      `;
+    }
+
+    function escapeXml(unsafe) {
+      return (unsafe || '').replace(/[<>&'"]/g, function (c) {
+        switch (c) {
+          case '<': return '&lt;';
+          case '>': return '&gt;';
+          case '&': return '&amp;';
+          case '\'': return '&apos;';
+          case '"': return '&quot;';
+        }
+      });
+    }
+
+    /* ==========================================================================
+       4. Inner QR Code SVG Generator (Modules, Shapes, Gradients, Eyes, Logo)
+       ========================================================================== */
+    function buildInnerQrSvg(qrModel, state, targetSize = 400) {
+      const count = qrModel.getModuleCount();
+      const cellSize = targetSize / count;
+
+      // Position detection corner eye bounds (top-left, top-right, bottom-left 7x7)
+      function isEye(r, c) {
+        if (r < 7 && c < 7) return true; // Top-left
+        if (r < 7 && c >= count - 7) return true; // Top-right
+        if (r >= count - 7 && c < 7) return true; // Bottom-left
+        return false;
+      }
+
+      // Check if coordinate is in center logo exclusion zone
+      let hasLogo = (state.logoPreset !== 'none' || state.customLogoUrl);
+      let logoModulesRadius = hasLogo ? Math.floor((count * (state.logoSize / 100)) / 2) + 1 : 0;
+      let centerModule = Math.floor(count / 2);
+
+      function isLogoArea(r, c) {
+        if (!hasLogo) return false;
+        return (Math.abs(r - centerModule) <= logoModulesRadius && Math.abs(c - centerModule) <= logoModulesRadius);
+      }
+
+      // Gradients & Defs
+      let defs = '';
+      let fillAttr = state.color1;
+      if (state.useGradient) {
+        if (state.gradientType === 'linear') {
+          defs += `
+            <linearGradient id="qrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="${state.color1}"/>
+              <stop offset="100%" stop-color="${state.color2}"/>
+            </linearGradient>
+          `;
+        } else {
+          defs += `
+            <radialGradient id="qrGrad" cx="50%" cy="50%" r="65%">
+              <stop offset="0%" stop-color="${state.color2}"/>
+              <stop offset="100%" stop-color="${state.color1}"/>
+            </radialGradient>
+          `;
+        }
+        fillAttr = 'url(#qrGrad)';
+      }
+
+      // Background rect
+      let bgSvg = '';
+      if (!state.isTransparent) {
+        bgSvg = `<rect x="0" y="0" width="${targetSize}" height="${targetSize}" fill="${state.bgColor}"/>`;
+      }
+
+      // Draw body data modules
+      let modulesSvg = '';
+      for (let r = 0; r < count; r++) {
+        for (let c = 0; c < count; c++) {
+          if (isEye(r, c) || isLogoArea(r, c)) continue;
+          if (qrModel.isDark(r, c)) {
+            let x = c * cellSize;
+            let y = r * cellSize;
+            modulesSvg += renderModule(x, y, cellSize, state.dotStyle, fillAttr);
+          }
+        }
+      }
+
+      // Draw the 3 Position Detection Eyes
+      let eyeOuterColor = state.customEyeColor ? state.eyeOuterColor : fillAttr;
+      let eyeInnerColor = state.customEyeColor ? state.eyeInnerColor : fillAttr;
+
+      let eyesSvg = '';
+      eyesSvg += renderCornerEye(0, 0, cellSize, state.eyeFrame, state.eyeBall, eyeOuterColor, eyeInnerColor, state.bgColor, state.isTransparent);
+      eyesSvg += renderCornerEye((count - 7) * cellSize, 0, cellSize, state.eyeFrame, state.eyeBall, eyeOuterColor, eyeInnerColor, state.bgColor, state.isTransparent);
+      eyesSvg += renderCornerEye(0, (count - 7) * cellSize, cellSize, state.eyeFrame, state.eyeBall, eyeOuterColor, eyeInnerColor, state.bgColor, state.isTransparent);
+
+      // Draw Center Logo / Badge
+      let logoSvg = '';
+      if (hasLogo) {
+        let logoPx = (targetSize * (state.logoSize / 100));
+        let lx = (targetSize - logoPx) / 2;
+        let ly = (targetSize - logoPx) / 2;
+        let pad = 8;
+
+        if (state.logoRemoveBg) {
+          logoSvg += `<rect x="${lx - pad}" y="${ly - pad}" width="${logoPx + pad * 2}" height="${logoPx + pad * 2}" rx="${(logoPx + pad * 2) * 0.25}" fill="#ffffff" filter="drop-shadow(0 2px 6px rgba(0,0,0,0.15))"/>`;
+        }
+
+        if (state.customLogoUrl) {
+          logoSvg += `<image href="${state.customLogoUrl}" x="${lx}" y="${ly}" width="${logoPx}" height="${logoPx}" preserveAspectRatio="xMidYMid meet"/>`;
+        } else {
+          logoSvg += renderPresetLogoIcon(state.logoPreset, lx, ly, logoPx);
+        }
+      }
+
+      return `
+        <svg viewBox="0 0 ${targetSize} ${targetSize}" width="${targetSize}" height="${targetSize}" xmlns="http://www.w3.org/2000/svg">
+          <defs>${defs}</defs>
+          ${bgSvg}
+          <g fill="${fillAttr}">
+            ${modulesSvg}
+          </g>
+          ${eyesSvg}
+          ${logoSvg}
+        </svg>
+      `;
+    }
+
+    /* Render single module based on style */
+    function renderModule(x, y, s, style, fill) {
+      if (style === 'rounded') {
+        let r = s * 0.35;
+        return `<rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${r}" fill="${fill}"/>`;
+      } else if (style === 'dots') {
+        let cx = x + s / 2;
+        let cy = y + s / 2;
+        let r = (s / 2) * 0.88;
+        return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}"/>`;
+      } else if (style === 'diamond') {
+        let cx = x + s / 2;
+        let cy = y + s / 2;
+        return `<polygon points="${cx},${y} ${x + s},${cy} ${cx},${y + s} ${x},${cy}" fill="${fill}"/>`;
+      } else if (style === 'leaf') {
+        let r = s * 0.55;
+        return `<path d="M ${x} ${y + r} Q ${x} ${y} ${x + r} ${y} L ${x + s} ${y} L ${x + s} ${y + s - r} Q ${x + s} ${y + s} ${x + s - r} ${y + s} L ${x} ${y + s} Z" fill="${fill}"/>`;
+      } else {
+        // Default crisp square
+        return `<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="${fill}"/>`;
+      }
+    }
+
+    /* Render Corner Position Detection Eye */
+    function renderCornerEye(x, y, cellSize, frameShape, ballShape, outerColor, innerColor, bgColor, isTransparent) {
+      let total = cellSize * 7;
+      let innerOffset = cellSize * 2;
+      let innerSize = cellSize * 3;
+
+      let outerSvg = '';
+      let bgMask = isTransparent ? '' : `<rect x="${x + cellSize}" y="${y + cellSize}" width="${cellSize * 5}" height="${cellSize * 5}" fill="${bgColor}"/>`;
+
+      if (frameShape === 'circle') {
+        let cx = x + total / 2;
+        let cy = y + total / 2;
+        let rOut = total / 2;
+        let rIn = (cellSize * 5) / 2;
+        outerSvg = `
+          <circle cx="${cx}" cy="${cy}" r="${rOut}" fill="${outerColor}"/>
+          <circle cx="${cx}" cy="${cy}" r="${rIn}" fill="${isTransparent ? '#ffffff' : bgColor}"/>
+        `;
+      } else if (frameShape === 'rounded') {
+        let r = cellSize * 2;
+        outerSvg = `
+          <rect x="${x}" y="${y}" width="${total}" height="${total}" rx="${r}" fill="${outerColor}"/>
+          <rect x="${x + cellSize}" y="${y + cellSize}" width="${cellSize * 5}" height="${cellSize * 5}" rx="${cellSize}" fill="${isTransparent ? '#ffffff' : bgColor}"/>
+        `;
+      } else if (frameShape === 'leaf') {
+        let r = cellSize * 2.5;
+        outerSvg = `
+          <path d="M ${x} ${y + r} Q ${x} ${y} ${x + r} ${y} L ${x + total} ${y} L ${x + total} ${y + total - r} Q ${x + total} ${y + total} ${x + total - r} ${y + total} L ${x} ${y + total} Z" fill="${outerColor}"/>
+          <rect x="${x + cellSize}" y="${y + cellSize}" width="${cellSize * 5}" height="${cellSize * 5}" rx="${cellSize}" fill="${isTransparent ? '#ffffff' : bgColor}"/>
+        `;
+      } else {
+        // Square
+        outerSvg = `
+          <rect x="${x}" y="${y}" width="${total}" height="${total}" fill="${outerColor}"/>
+          <rect x="${x + cellSize}" y="${y + cellSize}" width="${cellSize * 5}" height="${cellSize * 5}" fill="${isTransparent ? '#ffffff' : bgColor}"/>
+        `;
+      }
+
+      // Inner Eye Ball
+      let bx = x + innerOffset;
+      let by = y + innerOffset;
+      let ballSvg = '';
+
+      if (ballShape === 'circle') {
+        let bcx = bx + innerSize / 2;
+        let bcy = by + innerSize / 2;
+        ballSvg = `<circle cx="${bcx}" cy="${bcy}" r="${innerSize / 2}" fill="${innerColor}"/>`;
+      } else if (ballShape === 'diamond') {
+        let bcx = bx + innerSize / 2;
+        let bcy = by + innerSize / 2;
+        ballSvg = `<polygon points="${bcx},${by} ${bx + innerSize},${bcy} ${bcx},${by + innerSize} ${bx},${bcy}" fill="${innerColor}"/>`;
+      } else if (ballShape === 'rounded') {
+        ballSvg = `<rect x="${bx}" y="${by}" width="${innerSize}" height="${innerSize}" rx="${cellSize * 0.9}" fill="${innerColor}"/>`;
+      } else {
+        ballSvg = `<rect x="${bx}" y="${by}" width="${innerSize}" height="${innerSize}" fill="${innerColor}"/>`;
+      }
+
+      return `<g>${outerSvg}${ballSvg}</g>`;
+    }
+
+    /* Preset Logo SVGs */
+    function renderPresetLogoIcon(icon, x, y, size) {
+      let iconContent = '';
+      if (icon === 'web') {
+        iconContent = `<circle cx="50" cy="50" r="40" fill="none" stroke="#2563eb" stroke-width="8"/><ellipse cx="50" cy="50" rx="20" ry="40" fill="none" stroke="#2563eb" stroke-width="6"/><line x1="10" y1="50" x2="90" y2="50" stroke="#2563eb" stroke-width="6"/>`;
+      } else if (icon === 'wifi') {
+        iconContent = `<path d="M 15 35 Q 50 5 85 35 M 28 48 Q 50 28 72 48 M 40 62 Q 50 50 60 62" fill="none" stroke="#0284c7" stroke-width="9" stroke-linecap="round"/><circle cx="50" cy="78" r="7" fill="#0284c7"/>`;
+      } else if (icon === 'phone') {
+        iconContent = `<path d="M 30 20 L 42 20 L 48 35 L 40 42 C 45 55 55 65 68 70 L 75 62 L 90 68 L 90 80 C 90 86 85 90 78 90 C 45 90 20 65 20 32 C 20 25 24 20 30 20 Z" fill="#16a34a"/>`;
+      } else if (icon === 'mail') {
+        iconContent = `<rect x="15" y="25" width="70" height="50" rx="8" fill="#ea580c"/><path d="M 15 30 L 50 58 L 85 30" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>`;
+      } else if (icon === 'location') {
+        iconContent = `<path d="M 50 15 C 33 15 20 28 20 45 C 20 68 50 90 50 90 C 50 90 80 68 80 45 C 80 28 67 15 50 15 Z" fill="#dc2626"/><circle cx="50" cy="42" r="10" fill="#ffffff"/>`;
+      } else if (icon === 'whatsapp') {
+        iconContent = `<circle cx="50" cy="50" r="42" fill="#25D366"/><path d="M 33 33 C 33 33 45 30 52 42 C 58 52 67 52 67 52 C 67 52 70 65 60 70 C 50 75 35 60 33 33 Z" fill="#ffffff"/>`;
+      } else if (icon === 'instagram') {
+        iconContent = `<rect x="15" y="15" width="70" height="70" rx="20" fill="url(#igG)"/><circle cx="50" cy="50" r="18" fill="none" stroke="#ffffff" stroke-width="6"/><circle cx="68" cy="32" r="5" fill="#ffffff"/><defs><linearGradient id="igG" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="50%" stop-color="#ec4899"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs>`;
+      } else if (icon === 'youtube') {
+        iconContent = `<rect x="15" y="24" width="70" height="52" rx="14" fill="#FF0000"/><polygon points="42,36 65,50 42,64" fill="#ffffff"/>`;
+      } else if (icon === 'facebook') {
+        iconContent = `<circle cx="50" cy="50" r="42" fill="#1877F2"/><path d="M 55 88 L 55 55 L 66 55 L 68 42 L 55 42 L 55 35 C 55 31 56 28 62 28 L 68 28 L 68 16 C 66 16 61 15 55 15 C 42 15 35 23 35 37 L 35 42 L 24 42 L 24 55 L 35 55 L 35 88 Z" fill="#ffffff"/>`;
+      } else if (icon === 'cart') {
+        iconContent = `<path d="M 15 25 L 30 25 L 42 60 L 78 60 L 88 35 L 34 35" fill="none" stroke="#9333ea" stroke-width="7" stroke-linecap="round"/><circle cx="45" cy="76" r="8" fill="#9333ea"/><circle cx="75" cy="76" r="8" fill="#9333ea"/>`;
+      } else if (icon === 'heart') {
+        iconContent = `<path d="M 50 82 C 15 55 15 25 35 25 C 45 25 50 32 50 32 C 50 32 55 25 65 25 C 85 25 85 55 50 82 Z" fill="#ef4444"/>`;
+      } else if (icon === 'star') {
+        iconContent = `<polygon points="50,15 62,38 88,40 68,58 74,83 50,70 26,83 32,58 12,40 38,38" fill="#f59e0b"/>`;
+      } else if (icon === 'coffee') {
+        iconContent = `<path d="M 25 35 L 75 35 L 70 70 Q 70 82 50 82 Q 30 82 30 70 Z" fill="#78350f"/><path d="M 75 42 C 86 42 86 60 72 62" fill="none" stroke="#78350f" stroke-width="6"/>`;
+      }
+
+      return `
+        <svg x="${x}" y="${y}" width="${size}" height="${size}" viewBox="0 0 100 100">
+          ${iconContent}
+        </svg>
+      `;
+    }
+
+    /* ==========================================================================
+       5. UI Controller & Dynamic Builders
+       ========================================================================== */
+
+    // Populate Templates Showcase (24+ cards matching Image 1 top)
+    function buildTemplatesGrid() {
+      const container = document.getElementById('templatesGrid');
+      container.innerHTML = '';
+
+      DESIGN_TEMPLATES.forEach((tpl, idx) => {
+        const item = document.createElement('div');
+        item.className = 'template-item' + (idx === 0 ? ' active' : '');
+        item.dataset.index = idx;
+
+        // Mini preview SVG
+        let gradFill = tpl.c1;
+        let defs = '';
+        if (tpl.grad) {
+          defs = `<linearGradient id="tgrad_${idx}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${tpl.c1}"/><stop offset="100%" stop-color="${tpl.c2}"/></linearGradient>`;
+          gradFill = `url(#tgrad_${idx})`;
+        }
+        let borderStyle = tpl.frame !== 'frame_none' ? `stroke="${tpl.fColor || tpl.c1}" stroke-width="2"` : '';
+
+        item.innerHTML = `
+          <div class="template-preview" style="background:${tpl.bg || '#ffffff'};">
+            <svg width="48" height="48" viewBox="0 0 48 48">
+              <defs>${defs}</defs>
+              <rect x="2" y="2" width="44" height="44" rx="6" fill="${tpl.bg || '#ffffff'}" ${borderStyle}/>
+              <!-- Sample QR pattern blocks -->
+              <rect x="6" y="6" width="12" height="12" rx="${tpl.eyeF === 'rounded' || tpl.eyeF === 'circle' ? '4' : '1'}" fill="${gradFill}"/>
+              <rect x="8" y="8" width="8" height="8" fill="#ffffff"/>
+              <rect x="10" y="10" width="4" height="4" fill="${gradFill}"/>
+
+              <rect x="30" y="6" width="12" height="12" rx="${tpl.eyeF === 'rounded' || tpl.eyeF === 'circle' ? '4' : '1'}" fill="${gradFill}"/>
+              <rect x="32" y="8" width="8" height="8" fill="#ffffff"/>
+              <rect x="34" y="10" width="4" height="4" fill="${gradFill}"/>
+
+              <rect x="6" y="30" width="12" height="12" rx="${tpl.eyeF === 'rounded' || tpl.eyeF === 'circle' ? '4' : '1'}" fill="${gradFill}"/>
+              <rect x="8" y="32" width="8" height="8" fill="#ffffff"/>
+              <rect x="10" y="34" width="4" height="4" fill="${gradFill}"/>
+
+              <!-- Sample body dots -->
+              <circle cx="24" cy="12" r="2" fill="${gradFill}"/>
+              <circle cx="24" cy="24" r="2.5" fill="${gradFill}"/>
+              <circle cx="16" cy="24" r="2" fill="${gradFill}"/>
+              <circle cx="32" cy="24" r="2" fill="${gradFill}"/>
+              <circle cx="24" cy="36" r="2" fill="${gradFill}"/>
+              <circle cx="36" cy="36" r="2" fill="${gradFill}"/>
+            </svg>
+          </div>
+          <span class="template-name" title="${tpl.name}">${tpl.name}</span>
+        `;
+
+        item.addEventListener('click', () => {
+          document.querySelectorAll('.template-item').forEach(el => el.classList.remove('active'));
+          item.classList.add('active');
+          applyTemplate(tpl);
+        });
+
+        container.appendChild(item);
+      });
+    }
+
+    function applyTemplate(tpl) {
+      state.color1 = tpl.c1;
+      state.color2 = tpl.c2;
+      state.useGradient = !!tpl.grad;
+      state.bgColor = tpl.bg || '#ffffff';
+      state.isTransparent = false;
+      state.dotStyle = tpl.dot || 'square';
+      state.eyeFrame = tpl.eyeF || 'square';
+      state.eyeBall = tpl.eyeB || 'square';
+      state.customEyeColor = false;
+
+      if (tpl.frame) {
+        state.frameId = tpl.frame;
+        state.frameText = tpl.text || 'SCAN ME';
+        state.frameColor = tpl.fColor || tpl.c1;
+        document.getElementById('frameTextInput').value = state.frameText;
+        document.getElementById('frameColorInput').value = state.frameColor;
+        document.getElementById('frameColorHex').value = state.frameColor;
+      }
+
+      // Sync form controls
+      document.getElementById('qrColor1').value = state.color1;
+      document.getElementById('qrColor1Hex').value = state.color1;
+      document.getElementById('qrColor2').value = state.color2;
+      document.getElementById('qrColor2Hex').value = state.color2;
+      document.getElementById('gradientToggle').checked = state.useGradient;
+      document.getElementById('gradientRow').style.display = state.useGradient ? 'block' : 'none';
+      document.getElementById('bgColor').value = state.bgColor;
+      document.getElementById('bgColorHex').value = state.bgColor;
+      document.getElementById('transparentBg').checked = false;
+      document.getElementById('customEyeColorToggle').checked = false;
+      document.getElementById('eyeColorRow').style.display = 'none';
+
+      // Sync shapes
+      selectOptionGroup('dotStyleOptions', state.dotStyle);
+      selectOptionGroup('eyeFrameOptions', state.eyeFrame);
+      selectOptionGroup('eyeBallOptions', state.eyeBall);
+
+      renderStudio();
+      showToast(`Applied preset: ${tpl.name}`);
+    }
+
+    function selectOptionGroup(containerId, value) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.querySelectorAll('.option-card').forEach(card => {
+        card.classList.toggle('active', card.dataset.value === value);
+      });
+    }
+
+    // Populate Decorative Frames Accordion (Matching Images 1, 2, 3)
+    function buildFramesAccordion() {
+      const accordion = document.getElementById('framesAccordion');
+      accordion.innerHTML = '';
+
+      FRAME_CATEGORIES.forEach((cat, catIdx) => {
+        const item = document.createElement('div');
+        item.className = 'accordion-item';
+        item.dataset.category = cat.id;
+
+        const header = document.createElement('div');
+        header.className = 'accordion-header' + (catIdx === 0 ? ' active' : '');
+        header.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span>${cat.icon}</span>
+            <span>${cat.name}</span>
+            <span class="count-badge" style="font-size:0.7rem;">${cat.frames.length}</span>
+          </div>
+          <span class="accordion-arrow">▼</span>
+        `;
+
+        const content = document.createElement('div');
+        content.className = 'accordion-content' + (catIdx === 0 ? ' show' : '');
+
+        const subgrid = document.createElement('div');
+        subgrid.className = 'frames-subgrid';
+
+        cat.frames.forEach(frame => {
+          const fBtn = document.createElement('div');
+          fBtn.className = 'frame-btn' + (state.frameId === frame.id ? ' active' : '');
+          fBtn.dataset.frameId = frame.id;
+
+          // Thumbnail SVG
+          let thumbColor = frame.color || '#4f46e5';
+          let thumbSvg = `
+            <svg viewBox="0 0 60 60">
+              <rect x="4" y="4" width="52" height="52" rx="6" fill="#f8fafc" stroke="${thumbColor}" stroke-width="2"/>
+              <rect x="14" y="14" width="32" height="32" rx="4" fill="#e2e8f0"/>
+              <!-- Badge/Banner indicator -->
+              <rect x="10" y="44" width="40" height="7" rx="2" fill="${thumbColor}"/>
+            </svg>
+          `;
+          if (frame.id === 'frame_none') {
+            thumbSvg = `
+              <svg viewBox="0 0 60 60">
+                <rect x="12" y="12" width="36" height="36" rx="4" fill="#0f172a"/>
+                <rect x="16" y="16" width="10" height="10" fill="#ffffff"/>
+                <rect x="34" y="16" width="10" height="10" fill="#ffffff"/>
+                <rect x="16" y="34" width="10" height="10" fill="#ffffff"/>
+              </svg>
+            `;
+          }
+
+          fBtn.innerHTML = `
+            <div class="frame-thumb">${thumbSvg}</div>
+            <span class="frame-label" title="${frame.name}">${frame.name}</span>
+          `;
+
+          fBtn.addEventListener('click', () => {
+            document.querySelectorAll('.frame-btn').forEach(el => el.classList.remove('active'));
+            fBtn.classList.add('active');
+
+            state.frameId = frame.id;
+            state.frameCategory = cat.id;
+            if (frame.text !== undefined && frame.id !== 'frame_none') {
+              state.frameText = frame.text;
+              document.getElementById('frameTextInput').value = frame.text;
+            }
+            if (frame.color) {
+              state.frameColor = frame.color;
+              document.getElementById('frameColorInput').value = frame.color;
+              document.getElementById('frameColorHex').value = frame.color;
+            }
+
+            renderStudio();
+            showToast(`Selected frame: ${frame.name}`);
+          });
+
+          subgrid.appendChild(fBtn);
+        });
+
+        content.appendChild(subgrid);
+        item.appendChild(header);
+        item.appendChild(content);
+
+        header.addEventListener('click', () => {
+          const isOpen = content.classList.contains('show');
+          // Accordion toggle
+          header.classList.toggle('active', !isOpen);
+          content.classList.toggle('show', !isOpen);
+        });
+
+        accordion.appendChild(item);
+      });
+    }
+
+    // Filter frames by search input
+    document.getElementById('frameSearchInput').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      document.querySelectorAll('.accordion-item').forEach(item => {
+        const catName = item.querySelector('.accordion-header').textContent.toLowerCase();
+        let matchesFrame = false;
+        item.querySelectorAll('.frame-btn').forEach(fBtn => {
+          const fName = fBtn.querySelector('.frame-label').textContent.toLowerCase();
+          if (fName.includes(q)) {
+            matchesFrame = true;
+            fBtn.style.display = 'flex';
+          } else {
+            fBtn.style.display = q ? 'none' : 'flex';
+          }
+        });
+
+        if (!q || catName.includes(q) || matchesFrame) {
+          item.style.display = 'block';
+          if (q) {
+            item.querySelector('.accordion-header').classList.add('active');
+            item.querySelector('.accordion-content').classList.add('show');
+          }
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+
+    /* ==========================================================================
+       6. Content Formatting Logic
+       ========================================================================== */
+    function computeContentData() {
+      const type = state.contentType;
+      let result = '';
+
+      if (type === 'url') {
+        let val = document.getElementById('urlInput').value.trim();
+        if (val && !/^https?:\/\//i.test(val)) val = 'https://' + val;
+        result = val || 'https://google.com';
+      } else if (type === 'text') {
+        result = document.getElementById('textInput').value.trim() || 'SPVM3 Local QR Code Studio';
+      } else if (type === 'wifi') {
+        let ssid = document.getElementById('wifiSsid').value.trim() || 'MyNetwork';
+        let auth = document.getElementById('wifiAuth').value;
+        let pass = document.getElementById('wifiPass').value;
+        let hidden = document.getElementById('wifiHidden').checked ? 'true' : 'false';
+        result = `WIFI:S:${escapeWifi(ssid)};T:${auth};P:${escapeWifi(pass)};H:${hidden};;`;
+      } else if (type === 'vcard') {
+        let fn = document.getElementById('vcardFirst').value.trim() || 'Jane';
+        let ln = document.getElementById('vcardLast').value.trim() || 'Doe';
+        let org = document.getElementById('vcardOrg').value.trim();
+        let title = document.getElementById('vcardTitle').value.trim();
+        let phone = document.getElementById('vcardPhone').value.trim();
+        let email = document.getElementById('vcardEmail').value.trim();
+        let url = document.getElementById('vcardUrl').value.trim();
+
+        result = `BEGIN:VCARD\nVERSION:3.0\nN:${ln};${fn};;;\nFN:${fn} ${ln}`;
+        if (org) result += `\nORG:${org}`;
+        if (title) result += `\nTITLE:${title}`;
+        if (phone) result += `\nTEL;TYPE=CELL:${phone}`;
+        if (email) result += `\nEMAIL:${email}`;
+        if (url) result += `\nURL:${url}`;
+        result += `\nEND:VCARD`;
+      } else if (type === 'email') {
+        let to = document.getElementById('emailTo').value.trim() || 'hello@example.com';
+        let sub = document.getElementById('emailSubject').value.trim();
+        let body = document.getElementById('emailBody').value.trim();
+        result = `mailto:${to}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`;
+      } else if (type === 'phone') {
+        let phone = document.getElementById('phoneInput').value.trim() || '+15551234567';
+        result = `tel:${phone}`;
+      } else if (type === 'sms') {
+        let phone = document.getElementById('smsPhone').value.trim() || '+15551234567';
+        let msg = document.getElementById('smsMessage').value.trim();
+        result = `SMSTO:${phone}:${msg}`;
+      } else if (type === 'whatsapp') {
+        let phone = document.getElementById('waPhone').value.trim().replace(/[^0-9]/g, '') || '15551234567';
+        let msg = document.getElementById('waText').value.trim();
+        result = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+      }
+
+      state.formattedData = result;
+      return result;
+    }
+
+    function escapeWifi(str) {
+      return (str || '').replace(/([\\;,:"])/g, '\\$1');
+    }
+
+    /* ==========================================================================
+       7. Studio Live Rendering Pipeline
+       ========================================================================== */
+    function renderStudio() {
+      const data = computeContentData();
+
+      try {
+        // High Error Correction by default for robustness with logos and decorations
+        let ecLevel = QRCodeLib.CorrectLevel.H;
+        let qr = QRCodeLib.generate(data, ecLevel);
+
+        document.getElementById('matrixSizeText').textContent = `Version ${qr.typeNumber} (${qr.getModuleCount()}×${qr.getModuleCount()})`;
+        document.getElementById('ecLevelText').textContent = `EC: High (30%)`;
+
+        // Generate inner QR SVG
+        let innerSvg = buildInnerQrSvg(qr, state, 400);
+
+        // Wrap with festive/custom frame
+        let fullSvgString = renderFrameSvg(state.frameId, innerSvg, state.frameText, state.frameColor, state.frameTextColor);
+
+        // Inject into preview container
+        document.getElementById('canvasContainer').innerHTML = fullSvgString;
+
+      } catch (err) {
+        console.error('Rendering error:', err);
+      }
+    }
+
+    /* ==========================================================================
+       8. High Resolution PNG / SVG Exporting
+       ========================================================================== */
+    function getCleanSvgString() {
+      const container = document.getElementById('canvasContainer');
+      const svg = container.querySelector('svg');
+      if (!svg) return '';
+      return new XMLSerializer().serializeToString(svg);
+    }
+
+    async function downloadPng() {
+      const targetRes = parseInt(document.getElementById('exportResolution').value) || 1000;
+      const svgString = getCleanSvgString();
+      if (!svgString) return;
+
+      const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const URL = window.URL || window.webkitURL || window;
+      const blobURL = URL.createObjectURL(svgBlob);
+
+      const image = new Image();
+      image.onload = () => {
+        const canvas = document.getElementById('exportCanvas');
+        canvas.width = targetRes;
+        canvas.height = Math.round(targetRes * (image.height / image.width));
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob((blob) => {
+          const a = document.createElement('a');
+          a.download = `qr-code-${state.frameId}-${targetRes}px.png`;
+          a.href = URL.createObjectURL(blob);
+          a.click();
+          URL.revokeObjectURL(blobURL);
+          showToast(`Exported PNG (${targetRes}×${canvas.height}px)`);
+        }, 'image/png');
+      };
+      image.src = blobURL;
+    }
+
+    function downloadSvg() {
+      const svgString = getCleanSvgString();
+      if (!svgString) return;
+      const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const a = document.createElement('a');
+      a.download = `qr-code-${state.frameId}.svg`;
+      a.href = URL.createObjectURL(blob);
+      a.click();
+      showToast('Exported SVG Vector');
+    }
+
+    async function copyToClipboard() {
+      try {
+        const svgString = getCleanSvgString();
+        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        const URL = window.URL || window.webkitURL || window;
+        const blobURL = URL.createObjectURL(svgBlob);
+
+        const image = new Image();
+        image.onload = () => {
+          const canvas = document.getElementById('exportCanvas');
+          canvas.width = 1000;
+          canvas.height = Math.round(1000 * (image.height / image.width));
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+          canvas.toBlob(async (blob) => {
+            try {
+              await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+              showToast('Image copied to clipboard!');
+            } catch (err) {
+              showToast('Clipboard access was restricted.');
+            }
+            URL.revokeObjectURL(blobURL);
+          }, 'image/png');
+        };
+        image.src = blobURL;
+      } catch (err) {
+        showToast('Could not copy image.');
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    /* ==========================================================================
+       9. Event Listeners & Setup
+       ========================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      buildTemplatesGrid();
+      buildFramesAccordion();
+
+      // Content Tab Switching
+      document.querySelectorAll('#contentTabs .tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#contentTabs .tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const type = btn.dataset.type;
+          state.contentType = type;
+          document.getElementById('typeBadge').textContent = btn.textContent.trim();
+
+          document.querySelectorAll('.type-panel').forEach(p => p.style.display = 'none');
+          const activePanel = document.getElementById(`panel-${type}`);
+          if (activePanel) activePanel.style.display = 'block';
+
+          renderStudio();
+        });
+      });
+
+      // Form field inputs live preview
+      document.querySelectorAll('.type-panel input, .type-panel textarea, .type-panel select').forEach(input => {
+        input.addEventListener('input', renderStudio);
+        input.addEventListener('change', renderStudio);
+      });
+
+      // Frame text & colors
+      document.getElementById('frameTextInput').addEventListener('input', (e) => {
+        state.frameText = e.target.value;
+        renderStudio();
+      });
+      document.getElementById('frameColorInput').addEventListener('input', (e) => {
+        state.frameColor = e.target.value;
+        document.getElementById('frameColorHex').value = e.target.value;
+        renderStudio();
+      });
+      document.getElementById('frameColorHex').addEventListener('input', (e) => {
+        state.frameColor = e.target.value;
+        document.getElementById('frameColorInput').value = e.target.value;
+        renderStudio();
+      });
+      document.getElementById('frameTextColorInput').addEventListener('input', (e) => {
+        state.frameTextColor = e.target.value;
+        document.getElementById('frameTextColorHex').value = e.target.value;
+        renderStudio();
+      });
+      document.getElementById('frameTextColorHex').addEventListener('input', (e) => {
+        state.frameTextColor = e.target.value;
+        document.getElementById('frameTextColorInput').value = e.target.value;
+        renderStudio();
+      });
+
+      // Color 1
+      document.getElementById('qrColor1').addEventListener('input', (e) => {
+        state.color1 = e.target.value;
+        document.getElementById('qrColor1Hex').value = e.target.value;
+        renderStudio();
+      });
+      document.getElementById('qrColor1Hex').addEventListener('input', (e) => {
+        state.color1 = e.target.value;
+        document.getElementById('qrColor1').value = e.target.value;
+        renderStudio();
+      });
+
+      // Gradient toggle & Color 2
+      document.getElementById('gradientToggle').addEventListener('change', (e) => {
+        state.useGradient = e.target.checked;
+        document.getElementById('gradientRow').style.display = state.useGradient ? 'block' : 'none';
+        renderStudio();
+      });
+      document.getElementById('qrColor2').addEventListener('input', (e) => {
+        state.color2 = e.target.value;
+        document.getElementById('qrColor2Hex').value = e.target.value;
+        renderStudio();
+      });
+      document.getElementById('qrColor2Hex').addEventListener('input', (e) => {
+        state.color2 = e.target.value;
+        document.getElementById('qrColor2').value = e.target.value;
+        renderStudio();
+      });
+      document.getElementById('gradientType').addEventListener('change', (e) => {
+        state.gradientType = e.target.value;
+        renderStudio();
+      });
+
+      // Background color & transparent toggle
+      document.getElementById('bgColor').addEventListener('input', (e) => {
+        state.bgColor = e.target.value;
+        document.getElementById('bgColorHex').value = e.target.value;
+        renderStudio();
+      });
+      document.getElementById('transparentBg').addEventListener('change', (e) => {
+        state.isTransparent = e.target.checked;
+        renderStudio();
+      });
+
+      // Eye Color Customization
+      document.getElementById('customEyeColorToggle').addEventListener('change', (e) => {
+        state.customEyeColor = e.target.checked;
+        document.getElementById('eyeColorRow').style.display = state.customEyeColor ? 'flex' : 'none';
+        renderStudio();
+      });
+      document.getElementById('eyeOuterColor').addEventListener('input', (e) => {
+        state.eyeOuterColor = e.target.value;
+        document.getElementById('eyeOuterColorHex').value = e.target.value;
+        renderStudio();
+      });
+      document.getElementById('eyeInnerColor').addEventListener('input', (e) => {
+        state.eyeInnerColor = e.target.value;
+        document.getElementById('eyeInnerColorHex').value = e.target.value;
+        renderStudio();
+      });
+
+      // Quick Color Palette chips
+      document.querySelectorAll('.palette-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          state.color1 = chip.dataset.c1;
+          state.color2 = chip.dataset.c2;
+          document.getElementById('qrColor1').value = state.color1;
+          document.getElementById('qrColor1Hex').value = state.color1;
+          document.getElementById('qrColor2').value = state.color2;
+          document.getElementById('qrColor2Hex').value = state.color2;
+          renderStudio();
+        });
+      });
+
+      // Shapes & Dot Style options
+      function bindOptionGroup(containerId, stateKey) {
+        document.querySelectorAll(`#${containerId} .option-card`).forEach(card => {
+          card.addEventListener('click', () => {
+            document.querySelectorAll(`#${containerId} .option-card`).forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+            state[stateKey] = card.dataset.value;
+            renderStudio();
+          });
+        });
+      }
+      bindOptionGroup('dotStyleOptions', 'dotStyle');
+      bindOptionGroup('eyeFrameOptions', 'eyeFrame');
+      bindOptionGroup('eyeBallOptions', 'eyeBall');
+
+      // Logo Presets
+      document.querySelectorAll('#logoPresets .logo-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('#logoPresets .logo-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          state.logoPreset = chip.dataset.icon;
+          state.customLogoUrl = null;
+          document.getElementById('logoControls').style.display = (state.logoPreset === 'none') ? 'none' : 'block';
+          renderStudio();
+        });
+      });
+
+      // Custom Logo File Upload
+      const fileInput = document.getElementById('logoFileInput');
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (re) => {
+          state.customLogoUrl = re.target.result;
+          state.logoPreset = 'custom';
+          document.querySelectorAll('#logoPresets .logo-chip').forEach(c => c.classList.remove('active'));
+          document.getElementById('logoControls').style.display = 'block';
+          renderStudio();
+          showToast('Custom logo uploaded');
+        };
+        reader.readAsDataURL(file);
+      });
+
+      document.getElementById('removeLogoBtn').addEventListener('click', () => {
+        state.customLogoUrl = null;
+        state.logoPreset = 'none';
+        fileInput.value = '';
+        document.querySelectorAll('#logoPresets .logo-chip').forEach(c => c.classList.remove('active'));
+        document.querySelector('#logoPresets [data-icon="none"]').classList.add('active');
+        document.getElementById('logoControls').style.display = 'none';
+        renderStudio();
+        showToast('Logo removed');
+      });
+
+      document.getElementById('logoSizeSlider').addEventListener('input', (e) => {
+        state.logoSize = parseInt(e.target.value);
+        document.getElementById('logoSizeVal').textContent = `${state.logoSize}%`;
+        renderStudio();
+      });
+
+      document.getElementById('logoBgToggle').addEventListener('change', (e) => {
+        state.logoRemoveBg = e.target.checked;
+        renderStudio();
+      });
+
+      // Actions
+      document.getElementById('downloadPngBtn').addEventListener('click', downloadPng);
+      document.getElementById('downloadSvgBtn').addEventListener('click', downloadSvg);
+      document.getElementById('copyClipboardBtn').addEventListener('click', copyToClipboard);
+
+      // Reset All button
+      document.getElementById('resetAllBtn').addEventListener('click', () => {
+        applyTemplate(DESIGN_TEMPLATES[0]);
+      });
+
+      // Sample content button
+      document.getElementById('sampleDataBtn').addEventListener('click', () => {
+        document.getElementById('urlInput').value = 'https://instagram.com/localqrstudio';
+        state.contentType = 'url';
+        renderStudio();
+        showToast('Sample data loaded');
+      });
+
+      // Initial Render
+      renderStudio();
+    });
+  </script>
+</body>
+</html>
